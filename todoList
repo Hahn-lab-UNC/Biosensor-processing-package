@@ -1,4 +1,6 @@
-use single mask for all channels - unless aligning masks, but then use same mask for ratio?
 build photobleach curve-displaying GUI
-revamp Image Processing Options GUI
-implement channel naming GUI
+build new bleedthrough correction GUI
+
+~format configuration file
+~build masking/thresholding GUI
+~~implement channel naming GUI

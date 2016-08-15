@@ -42,6 +42,8 @@ else
     gui_mainfcn(gui_State, varargin{:});
 end
 % End initialization code - DO NOT EDIT
+
+
 function MovThresh_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
@@ -1351,7 +1353,7 @@ function importMovie_Callback(hObject, eventdata, handles)
 function save_as_Callback(hObject, eventdata, handles)
 
     dlg_title = 'Save Masked Images as a TIF-File';
-    [FileName,PathName,FilterIndex] = uiputfile('*.tif',dlg_title,'MaskedImages');
+    [FileName,PathName,FilterIndex] = uiputfile('*.tif',dlg_title,'maskfor_');
     if FilterIndex
         if handles.LastSel==1
             thresh=handles.Y;

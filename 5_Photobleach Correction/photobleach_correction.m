@@ -4,7 +4,7 @@ function photobleach_correction(svd, registered)
 
 % Import necessary data
 donor_path = cd;
-if registered == 1
+if registered ~= 2
     donor_file = 'donor_reg.tif';
 else
     donor_file = 'donor_masked.tif';

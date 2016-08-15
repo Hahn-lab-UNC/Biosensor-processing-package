@@ -1,4 +1,4 @@
-function registration
+function auto_registration
 
 donor_path = cd;
 donor_file = 'donor_masked.tif';

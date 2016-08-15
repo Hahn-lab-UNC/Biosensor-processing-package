@@ -1,4 +1,4 @@
-function mask_images(svd)
+function mask_images(svd, one_mask)
 
 %% Breakup donor, FRET, and acceptor Images Into Managable Number of Frames
 % Matlab has limited memory and therefore a maximum possible array size
@@ -20,12 +20,16 @@ if svd == 2
     file_tifC = 'acceptor_scbg_roi.tif';
 end
 
-file_tifD = 'MaskedImages-donor.tif';
-file_tifE = 'MaskedImages-fret.tif';
-if svd == 2
-    file_tifF = 'MaskedImages-acceptor.tif';
+if one_mask == 0
+    file_tifD = 'maskfor_donor.tif';
+    file_tifE = 'maskfor_fret.tif';
+    if svd == 2
+        file_tifF = 'maskfor_acceptor.tif';
+    end
+else
+    file_tifG = 'maskfor_.tif';
 end
-
+    
 %% Find and Delete Previous Versions of '.tif' Images
 %  In order to write mulitple pages (frames) to a '.tif' requires appending
 %  them during the writing process.  Therefore, it is imperative to delete
@@ -51,12 +55,18 @@ mImage = infoA(1).Width;   % number of pixels in the X direction
 nImage = infoA(1).Height;  % number of pixels in the Y direction 
 num_images = length(infoA);  % total number of frames in '.tif' stack
 
-infoD = imfinfo(file_tifD);
-infoE = imfinfo(file_tifE);
+if one_mask == 0
+    infoD = imfinfo(file_tifD);
+    infoE = imfinfo(file_tifE);
+else
+    infoG = imfinfo(file_tifG);
+end
 
 if svd == 2
     infoC = imfinfo(file_tifC);
-    infoF = imfinfo(file_tifF);   
+    if one_mask == 0
+        infoF = imfinfo(file_tifF);
+    end
 end
 
 %% Preallocate Variables for Performance
@@ -84,35 +94,52 @@ for i = 1:loop
     
     %%
     donor_matrix = zeros(nImage, mImage, length(ind), 'uint16');
-    donor_mask = zeros(nImage, mImage, length(ind), 'uint16');
-    
     fret_matrix = zeros(nImage, mImage, length(ind), 'uint16');
-    fret_mask = zeros(nImage, mImage, length(ind), 'uint16');
-    
     if svd == 2
         acceptor_matrix = zeros(nImage, mImage, length(ind), 'uint16');
-        acceptor_mask = zeros(nImage, mImage, length(ind), 'uint16');
     end    
-        
+    
+    if one_mask == 0
+        donor_mask = zeros(nImage, mImage, length(ind), 'uint16');
+        fret_mask = zeros(nImage, mImage, length(ind), 'uint16');
+        if svd == 2
+            acceptor_mask = zeros(nImage, mImage, length(ind), 'uint16');
+        end
+    else
+        single_mask = zeros(nImage, mImage, length(ind), 'uint16');
+    end  
+    
     for j = ind
         donor_matrix (:,:,find(ind==j,1,'first')) = imread(file_tifA, 'Index', j, 'Info', infoA);  % read the correct subsection of frames of image A
-        donor_mask (:,:,find(ind==j,1,'first')) = imread(file_tifD, 'Index', j, 'Info', infoD);  % read the correct subsection of frames of image D
-        
         fret_matrix(:,:,find(ind==j,1,'first')) = imread(file_tifB, 'Index', j, 'Info', infoB);  % read the correct subsection of frames of image B
-        fret_mask (:,:,find(ind==j,1,'first')) = imread(file_tifE, 'Index', j, 'Info', infoE);  % read the correct subsection of frames of image E
-        
         if svd == 2
             acceptor_matrix (:,:,find(ind==j,1,'first')) = imread(file_tifC, 'Index', j, 'Info', infoA);  % read the correct subsection of frames of image C
-            acceptor_mask (:,:,find(ind==j,1,'first')) = imread(file_tifF, 'Index', j, 'Info', infoD);  % read the correct subsection of frames of image F
+        end
+        
+        if one_mask == 0
+            donor_mask (:,:,find(ind==j,1,'first')) = imread(file_tifD, 'Index', j, 'Info', infoD);  % read the correct subsection of frames of image D
+            fret_mask (:,:,find(ind==j,1,'first')) = imread(file_tifE, 'Index', j, 'Info', infoE);  % read the correct subsection of frames of image E
+            if svd == 2
+                acceptor_mask (:,:,find(ind==j,1,'first')) = imread(file_tifF, 'Index', j, 'Info', infoD);  % read the correct subsection of frames of image F
+            end
+        else
+            single_mask (:,:,find(ind==j,1,'first')) = imread(file_tifG, 'Index', j, 'Info', infoG);  % read the correct subsection of frames of image G
         end
     end
     
     %% Apply Mask to Shade Corrected, Background Subtracted, Cropped, and Registered* Matrices
-    % *only registered if selected in image processing options
-    donor_mk = donor_matrix .* donor_mask;
-    fret_mk = fret_matrix .* fret_mask;
-    if svd == 2
-        acceptor_mk = donor_matrix .* acceptor_mask;
+    if one_mask == 0
+        donor_mk = donor_matrix .* donor_mask;
+        fret_mk = fret_matrix .* fret_mask;
+        if svd == 2
+            acceptor_mk = donor_matrix .* acceptor_mask;
+        end
+    else
+        donor_mk = donor_matrix .* single_mask;
+        fret_mk = fret_matrix .* single_mask;
+        if svd == 2
+            acceptor_mk = donor_matrix .* single_mask;
+        end
     end
     
     %%
@@ -174,15 +201,15 @@ for i = 1:loop
     end
         
     %% Figures
-    if i == 1 && view_fig == 1
-        f7 = figure('Name', 'Masked Images');
-        subplot(3,2,1); imagesc(donor_matrix(:,:,1)); axis image; colorbar; title('donor_scbg_roi');
-        subplot(3,2,2); imagesc(donor_mk(:,:,1)); axis image; colorbar; title('donor_masked');
-        subplot(3,2,3); imagesc(fret_matrix(:,:,1)); axis image; colorbar; title('FRET_scbg_roi');
-        subplot(3,2,4); imagesc(fret_mk(:,:,1)); axis image; colorbar; title('FRET_masked');
-        if svd == 2
-            subplot(3,3,5); imagesc(acceptor_matrix(:,:,1)); axis image; colorbar; title('acceptor_scbg');
-            subplot(3,3,6); imagesc(acceptor_mk(:,:,1)); axis image; colorbar; title('acceptor_masked');
-        end
-    end
+%     if i == 1 && view_fig == 1
+%         f7 = figure('Name', 'Masked Images');
+%         subplot(3,2,1); imagesc(donor_matrix(:,:,1)); axis image; colorbar; title('donor_scbg_roi');
+%         subplot(3,2,2); imagesc(donor_mk(:,:,1)); axis image; colorbar; title('donor_masked');
+%         subplot(3,2,3); imagesc(fret_matrix(:,:,1)); axis image; colorbar; title('FRET_scbg_roi');
+%         subplot(3,2,4); imagesc(fret_mk(:,:,1)); axis image; colorbar; title('FRET_masked');
+%         if svd == 2
+%             subplot(3,3,5); imagesc(acceptor_matrix(:,:,1)); axis image; colorbar; title('acceptor_scbg');
+%             subplot(3,3,6); imagesc(acceptor_mk(:,:,1)); axis image; colorbar; title('acceptor_masked');
+%         end
+%     end
 end

@@ -1,56 +1,40 @@
 function background_subtraction(svd)
 
-if exist('region_boxes.txt', 'file') == 2
-    % * reads in previous boxes and sets variables
-    disp('Region_boxes file found, using regions in file');
-    fid = fopen('region_boxes.txt', 'r');
-    str = fscanf(fid, '%c');
-    expr1 = 'background_Box = [(.*)\]r';
-    expr2 = 'region_box = [(.*)\]';
-    tokens1 = regexp(str, expr1, 'tokens');
-    tokens2 = regexp(str, expr2, 'tokens');
-    bg = cell2mat(textscan(tokens1{1}{1}, '%d %d %d %d', 'delimiter', ','));
-    rg = cell2mat(textscan(tokens2{1}{1}, '%d %d %d %d', 'delimiter', ','));
-    X1 = bg(1);
-    Y1 = bg(2);
-    W1 = bg(3);
-    H1 = bg(4);
-    X2 = rg(1);
-    Y2 = rg(2);
-    W2 = rg(3);
-    H2 = rg(4);
-else
-    % * Sets the pixel height/width for background subtraction
-    background_Box = input('Enter background box: ','s');
-    v = eval(background_Box);
-    X1 = ceil(v(1));
-    Y1 = ceil(v(2));
-    W1 = ceil(v(3));
-    H1 = ceil(v(4));
-    % X1 = input('Enter X_min for background:  ');
-    % Y1 = input ('Enter Y_min for background: ');
-    % W1 = input('Enter Width for background:  ');
-    % H1 = input('Enter Height for background:  ');
+%#ok<*NASGU>
 
-    % * Sets the pixel height/width for the region of interest
-    Reg_Box = input('Enter the region box: ','s');
-    v = eval(Reg_Box);
-    X2 = ceil(v(1));
-    Y2 = ceil(v(2));
-    W2 = ceil(v(3));
-    H2 = ceil(v(4));
-    % X2 = input('Enter X_min for subregion:  ');
-    % Y2 = input ('Enter Y_min for subregion: ');
-    % W2 = input('Enter Width for subregion:  ');
-    % H2 = input('Enter Height for subregion:  ');
-
-    % * save boxes to text
-    fid = fopen('region_boxes.txt','wt');%we could also provide a uiputfile here to allow the user to choose the name
-    fprintf(fid,'background_Box = [%d,%d,%d,%d]',X1,Y1,W1,H1);
-    fprintf(fid,'region_box = [%d,%d,%d,%d]',X2,Y2,W2,H2);
+while 1
+    handle = background_subtractionGUI;
+    waitfor(handle)
+    if exist('region_boxes.txt', 'file') == 2
+        % * reads in region boxes and sets variables
+        fid = fopen('region_boxes.txt', 'r');
+        str = fscanf(fid, '%c');
+        expr1 = 'background_box = [(.*)\]';
+        expr2 = 'region_box = [(.*)\]';
+        tokens1 = regexp(str, expr1, 'tokens');
+        tokens2 = regexp(str, expr2, 'tokens');
+        bg = cell2mat(textscan(tokens1{1}{1}, '%d %d %d %d', 'delimiter', ','));
+        rg = cell2mat(textscan(tokens2{1}{1}, '%d %d %d %d', 'delimiter', ','));
+        X1 = bg(1);
+        Y1 = bg(2);
+        W1 = bg(3);
+        H1 = bg(4);
+        X2 = rg(1);
+        Y2 = rg(2);
+        W2 = rg(3);
+        H2 = rg(4);
+        fclose(fid);
+        break
+    else
+        disp('No "region_boxes.txt" file found in path...\n');
+        yn = input('Relaunch Background Subtraction GUI to calculate regions? (y/n)');
+        if yn == 'y'
+            continue
+        else
+            error('Script needs "region_boxes.txt" to continue processing. Exiting script...');
+        end
+    end
 end
-
-fclose(fid);
 
 %% Find and Delete Previous Versions of '.tif' Images
 %  To write mulitple pages (frames) to a '.tif' requires appending them
@@ -59,7 +43,7 @@ fclose(fid);
 %  '.tif' file.
 
 % * Tries to find the specific '.tif' files and delete them.
-try %#ok<*TRYNC>
+try %#ok<*UNRCH,*TRYNC>
     delete('donor_scbg.tif');   % shade corrected, background subtracted, donor excitation, donor channel emission
 end
 try
@@ -241,41 +225,41 @@ for i = 1:loop
 
     %% Figures
     % * only viewed on first loop and if the variable 'view_fig' is equal to 1.
-    if i == 1 && view_fig == 1
-
-        if svd == 1
-            f5 = figure('Name', 'Background Corrected');
-            subplot(3,2,1); imagesc(donor_sc(:,:,1)); axis image; colorbar; title('donor_sc');
-            subplot(3,2,2); imagesc(donor_scbg(:,:,1)); axis image; colorbar; title('donor_scbg');
-            subplot(3,2,3); imagesc(fret_sc(:,:,1)); axis image; colorbar; title('FRET_sc');
-            subplot(3,2,4); imagesc(fret_scbg(:,:,1)); axis image; colorbar; title('FRET_scbg');
-
-            f6 = figure('Name', 'Background Corrected - ROI');
-            subplot(3,2,1); imagesc(donor_scbg(:,:,1)); axis image; colorbar; title('donor_scbg');
-            subplot(3,2,2); imagesc(donor_scbg_roi(:,:,1)); axis image; colorbar; title('donor_scbg-region');
-            subplot(3,2,3); imagesc(fret_scbg(:,:,1)); axis image; colorbar; title('FRET_scbg');
-            subplot(3,2,4); imagesc(fret_scbg_roi(:,:,1)); axis image; colorbar; title('FRET_scbg-region');
-        else
-            f5 = figure('Name', 'Background Corrected');
-            subplot(3,2,1); imagesc(donor_sc(:,:,1)); axis image; colorbar; title('donor_sc');
-            subplot(3,2,2); imagesc(donor_scbg(:,:,1)); axis image; colorbar; title('FRET_scbg');
-            subplot(3,2,3); imagesc(fret_sc(:,:,1)); axis image; colorbar; title('FRET_sc');
-            subplot(3,2,4); imagesc(fret_scbg(:,:,1)); axis image; colorbar; title('FRET_scbg');
-            subplot(3,2,5); imagesc(acceptor_sc(:,:,1)); axis image; colorbar; title('acceptor_sc');
-            subplot(3,2,6); imagesc(acceptor_scbg(:,:,1)); axis image; colorbar; title('acceptor_scbg');
-
-            f6 = figure('Name', 'Background Corrected - ROI');
-            subplot(3,2,1); imagesc(donor_scbg(:,:,1)); axis image; colorbar; title('donor_scbg');
-            subplot(3,2,2); imagesc(donor_scbg_roi(:,:,1)); axis image; colorbar; title('donor_scbg-region');
-            subplot(3,2,3); imagesc(fret_scbg(:,:,1)); axis image; colorbar; title('FRET_scbg');
-            subplot(3,2,4); imagesc(fret_scbg_roi(:,:,1)); axis image; colorbar; title('FRET_scbg-region');
-            subplot(3,2,5); imagesc(acceptor_scbg(:,:,1)); axis image; colorbar; title('acceptor_scbg');
-            subplot(3,2,6); imagesc(acceptor_scbg_roi(:,:,1)); axis image; colorbar; title('acceptor_scbg-region');
-        end
+%     if i == 1 && view_fig == 1
+% 
+%         if svd == 1
+%             f5 = figure('Name', 'Background Corrected');
+%             subplot(3,2,1); imagesc(donor_sc(:,:,1)); axis image; colorbar; title('donor_sc');
+%             subplot(3,2,2); imagesc(donor_scbg(:,:,1)); axis image; colorbar; title('donor_scbg');
+%             subplot(3,2,3); imagesc(fret_sc(:,:,1)); axis image; colorbar; title('FRET_sc');
+%             subplot(3,2,4); imagesc(fret_scbg(:,:,1)); axis image; colorbar; title('FRET_scbg');
+% 
+%             f6 = figure('Name', 'Background Corrected - ROI');
+%             subplot(3,2,1); imagesc(donor_scbg(:,:,1)); axis image; colorbar; title('donor_scbg');
+%             subplot(3,2,2); imagesc(donor_scbg_roi(:,:,1)); axis image; colorbar; title('donor_scbg-region');
+%             subplot(3,2,3); imagesc(fret_scbg(:,:,1)); axis image; colorbar; title('FRET_scbg');
+%             subplot(3,2,4); imagesc(fret_scbg_roi(:,:,1)); axis image; colorbar; title('FRET_scbg-region');
+%         else
+%             f5 = figure('Name', 'Background Corrected');
+%             subplot(3,2,1); imagesc(donor_sc(:,:,1)); axis image; colorbar; title('donor_sc');
+%             subplot(3,2,2); imagesc(donor_scbg(:,:,1)); axis image; colorbar; title('FRET_scbg');
+%             subplot(3,2,3); imagesc(fret_sc(:,:,1)); axis image; colorbar; title('FRET_sc');
+%             subplot(3,2,4); imagesc(fret_scbg(:,:,1)); axis image; colorbar; title('FRET_scbg');
+%             subplot(3,2,5); imagesc(acceptor_sc(:,:,1)); axis image; colorbar; title('acceptor_sc');
+%             subplot(3,2,6); imagesc(acceptor_scbg(:,:,1)); axis image; colorbar; title('acceptor_scbg');
+% 
+%             f6 = figure('Name', 'Background Corrected - ROI');
+%             subplot(3,2,1); imagesc(donor_scbg(:,:,1)); axis image; colorbar; title('donor_scbg');
+%             subplot(3,2,2); imagesc(donor_scbg_roi(:,:,1)); axis image; colorbar; title('donor_scbg-region');
+%             subplot(3,2,3); imagesc(fret_scbg(:,:,1)); axis image; colorbar; title('FRET_scbg');
+%             subplot(3,2,4); imagesc(fret_scbg_roi(:,:,1)); axis image; colorbar; title('FRET_scbg-region');
+%             subplot(3,2,5); imagesc(acceptor_scbg(:,:,1)); axis image; colorbar; title('acceptor_scbg');
+%             subplot(3,2,6); imagesc(acceptor_scbg_roi(:,:,1)); axis image; colorbar; title('acceptor_scbg-region');
+%         end
 
         % saveas(f5, 'Bkgrnd_corrected.eps');
         % saveas(f6, 'Cell subregion.eps');
-    end
+%     end
 end
 
 end

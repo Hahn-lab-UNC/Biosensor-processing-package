@@ -22,7 +22,7 @@ function varargout = registrationGUI(varargin)
 
 % Edit the above text to modify the response to help registrationGUI
 
-% Last Modified by GUIDE v2.5 04-Aug-2016 13:43:10
+% Last Modified by GUIDE v2.5 08-Aug-2016 10:33:49
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -103,9 +103,6 @@ setGlobal_fuses(f_cell);
 
 % Update handles structure
 guidata(hObject, handles);
-
-% UIWAIT makes registrationGUI wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
 
 function varargout = registrationGUI_OutputFcn(~, ~, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
@@ -280,7 +277,6 @@ update_images(hObject,frame);
 set(handles.edit3,'String',num2str(frame,'%d')); % set the edit box to indicate the current frame number
 guidata(hObject, handles);
 
-%%
 function mousehover(hObject, varargin)
 handles = guidata(hObject);
 global rect;
@@ -375,7 +371,6 @@ end
 %         ceil(pt(1,2)),ceil(pt(1,1)),im_f(ceil(pt(1,2)),ceil(pt(1,1)))
 
 
-
 %% CLim Edit Boxes
 function CLim_Min_Tag1_CreateFcn(hObject, ~, ~) %#ok<DEFNU>
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
@@ -413,68 +408,68 @@ guidata(hObject,handles);  % update handles structure
 
 
 %% Sliders
-function slider1_CreateFcn(hObject, ~, ~)%#ok<DEFNU>
+function slider1_CreateFcn(hObject, ~, ~) %#ok<DEFNU>
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-function slider2_CreateFcn(hObject, ~, ~)%#ok<DEFNU>
+function slider2_CreateFcn(hObject, ~, ~) %#ok<DEFNU>
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-function slider3_CreateFcn(hObject, ~, ~)%#ok<DEFNU>
+function slider3_CreateFcn(hObject, ~, ~) %#ok<DEFNU>
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-function slider4_CreateFcn(hObject, ~, ~)%#ok<DEFNU>
+function slider4_CreateFcn(hObject, ~, ~) %#ok<DEFNU>
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-function slider5_CreateFcn(hObject, ~, ~)%#ok<DEFNU>
+function slider5_CreateFcn(hObject, ~, ~) %#ok<DEFNU>
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-function slider6_CreateFcn(hObject, ~, ~)%#ok<DEFNU>
+function slider6_CreateFcn(hObject, ~, ~) %#ok<DEFNU>
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
-function slider7_CreateFcn(hObject, ~, ~)%#ok<DEFNU>
+function slider7_CreateFcn(hObject, ~, ~) %#ok<DEFNU>
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
 
-function slider1_Callback(hObject, ~, handles)%#ok<DEFNU>
+function slider1_Callback(hObject, ~, handles) %#ok<DEFNU>
 if get(handles.slider1,'Value') == get(handles.slider2,'Value')+1
     set(handles.slider2,'Enable','Off');
 else
     set(handles.slider2,'Enable','On');
 end
 guidata(hObject,handles);
-function slider2_Callback(hObject, ~, handles)%#ok<DEFNU>
+function slider2_Callback(hObject, ~, handles) %#ok<DEFNU>
 if get(handles.slider2,'Value') == get(handles.slider1,'Value')-1
     set(handles.slider1,'Enable','Off');
 else
     set(handles.slider1,'Enable','On');
 end
 guidata(hObject,handles);
-function slider3_Callback(hObject, ~, handles)%#ok<DEFNU>
+function slider3_Callback(hObject, ~, handles) %#ok<DEFNU>
 if get(handles.slider3,'Value') == get(handles.slider4,'Value')+1
     set(handles.slider4,'Enable','Off');
 else
     set(handles.slider4,'Enable','On');
 end
 guidata(hObject,handles);
-function slider4_Callback(hObject, ~, handles)%#ok<DEFNU>
+function slider4_Callback(hObject, ~, handles) %#ok<DEFNU>
 if get(handles.slider4,'Value') == get(handles.slider3,'Value')-1
     set(handles.slider3,'Enable','Off');
 else
     set(handles.slider3,'Enable','On');
 end
 guidata(hObject,handles);
-function slider7_Callback(~, ~, ~)%#ok<DEFNU>
+function slider7_Callback(~, ~, ~) %#ok<DEFNU>
 
 
 %% Radio Button Group
-function uibuttongroup1_SelectionChangedFcn(hObject, ~, handles)%#ok<DEFNU>
+function uibuttongroup1_SelectionChangedFcn(hObject, ~, handles) %#ok<DEFNU>
 toggle = get(handles.radiobutton1,'Value');
 if toggle == 1
     setGlobaly(str2double(get(handles.text3,'String')));
@@ -493,13 +488,13 @@ update_images(hObject,round(get(handles.slider7,'Value')));
 guidata(hObject,handles);
 
     
-%% Popup Menu
-function popupmenu1_CreateFcn(hObject, ~, ~)%#ok<DEFNU>
+%% Pop-up Menu
+function popupmenu1_CreateFcn(hObject, ~, ~) %#ok<DEFNU>
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
-function popupmenu1_Callback(hObject, ~, handles)%#ok<DEFNU>
+function popupmenu1_Callback(hObject, ~, handles) %#ok<DEFNU>
 % base/register --> overlay [R G B]
 % green/blue --> cyan       [0 1 2] index = 1
 % blue/green --> cyan       [0 2 1] index = 2
@@ -517,26 +512,26 @@ update_images(hObject,round(get(handles.slider7,'Value')));
 
 
 %% Edit Boxes
-function edit1_CreateFcn(hObject, ~, ~)%#ok<DEFNU>
+function edit1_CreateFcn(hObject, ~, ~) %#ok<DEFNU>
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-function edit2_CreateFcn(hObject, ~, ~)%#ok<DEFNU>
+function edit2_CreateFcn(hObject, ~, ~) %#ok<DEFNU>
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-function edit3_CreateFcn(hObject, ~, ~)%#ok<DEFNU>
+function edit3_CreateFcn(hObject, ~, ~) %#ok<DEFNU>
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-function edit8_CreateFcn(hObject, ~, handles)%#ok<DEFNU>
+function edit8_CreateFcn(hObject, ~, handles) %#ok<DEFNU>
 handles.pausetime = str2double(get(hObject,'String'));
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 guidata(hObject,handles);
 
-function edit1_Callback(hObject, ~, handles)%#ok<DEFNU>
+function edit1_Callback(hObject, ~, handles) %#ok<DEFNU>
 var = round(str2double(get(handles.edit1,'String')));
 set(handles.edit1,'String',num2str(var));
 if abs(var) <= 10
@@ -552,7 +547,7 @@ if get(handles.radiobutton1,'Value') ~= 1
     setGlobaly(var);
 end
 guidata(hObject,handles);
-function edit2_Callback(hObject, ~, handles)%#ok<DEFNU>
+function edit2_Callback(hObject, ~, handles) %#ok<DEFNU>
 var = round(str2double(get(handles.edit2,'String')));
 set(handles.edit2,'String',num2str(var));
 if abs(var) <= 10
@@ -568,7 +563,7 @@ if get(handles.radiobutton1,'Value') ~= 1
     setGlobalx(var);
 end
 guidata(hObject,handles);
-function edit3_Callback(hObject, ~, handles)%#ok<DEFNU>
+function edit3_Callback(hObject, ~, handles) %#ok<DEFNU>
 frame = str2double(get(hObject,'String'));
 frame_max = get(handles.slider7,'Max');
 if floor(frame) < 1
@@ -581,15 +576,15 @@ else
     set(handles.slider7,'Value',frame);
 end
 guidata(hObject,handles);
-function edit8_Callback(hObject, ~, handles)%#ok<DEFNU>
+function edit8_Callback(hObject, ~, handles) %#ok<DEFNU>
 handles.pausetime = str2double(get(hObject,'String'));
 guidata(hObject,handles);
 
 
 %% Menu Option Tags
-function file_tag_Callback(~, ~, ~)%#ok<DEFNU>
+function file_tag_Callback(~, ~, ~) %#ok<DEFNU>
 
-function import_tag_Callback(hObject, ~, handles)%#ok<DEFNU>
+function import_tag_Callback(hObject, ~, handles) %#ok<DEFNU>
 
 if ~isempty(get(handles.axes1,'Children'))
     set(handles.slider1,'Enable','Off');
@@ -658,7 +653,6 @@ for i = 1:num_frames_b
    maxs_r(i) = max(max(handles.frames_r{i}));
 end
 
-% handles.overlay_im = zeros(handles.height_b,handles.width_b);
 handles.overlay_im = 0;
 
 % perform automatic registration
@@ -724,7 +718,7 @@ set(handles.CLim_Min_Tag1, 'String', num2str(handles.CLim_Min_b));
 set(handles.CLim_Max_Tag2, 'String', num2str(handles.CLim_Max_r));
 set(handles.CLim_Min_Tag2, 'String', num2str(handles.CLim_Min_r));
 
-% set to initially display 'frame 1' in textbox
+% set to display max frames in textbox
 set(handles.text6,'String',['of ',num2str(num_frames_b,'%d')]);
 
 % set offset sliders
@@ -749,14 +743,9 @@ handles.sl7 = addlistener(handles.slider7,'Value','PostSet',@(src,evnt)slider7(h
 % set mouse hover functionality
 set(handles.figure1,'WindowButtonMotionFcn',@(varargin) mousehover(handles.figure1,varargin));
 
-% set axes to initially display frame 1 of each image
-% handles.curImage_b = handles.frames_b{1};
-% handles.curImage_r = handles.frames_r{1};
-
-
 guidata(hObject,handles);
 
-function save_tag_Callback(hObject, ~, handles)%#ok<DEFNU>
+function save_tag_Callback(hObject, ~, handles) %#ok<DEFNU>
 % disable all components to save registered image
 set(handles.slider1,'Enable','Off');
 set(handles.slider2,'Enable','Off');
@@ -851,8 +840,9 @@ set(handles.playtoggle1,'Enable','On');
 
 guidata(hObject,handles);
 
+
 %% Play Toggle Callbacks
-function playtoggle1_OnCallback(~, ~, handles)%#ok<DEFNU>
+function playtoggle1_OnCallback(~, ~, handles) %#ok<DEFNU>
 pause_time = handles.pausetime/1000;
 i = get(handles.slider7,'Value');
 frames = get(handles.slider7,'Max');
@@ -871,7 +861,7 @@ while 1
     pause(pause_time);
 end
 
-function playtoggle1_OffCallback(hObject, ~, handles)%#ok<DEFNU>
+function playtoggle1_OffCallback(hObject, ~, handles) %#ok<DEFNU>
 user_data = get(hObject,'UserData');
 user_data.stop = 1;
 set(hObject,'UserData',user_data);
