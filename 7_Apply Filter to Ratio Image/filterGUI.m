@@ -233,7 +233,7 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
 
-function slider1_Callback(~, ~, ~) 
+function slider1_Callback(~, ~, ~)
 function slider2_Callback(hObject, ~, handles)
 if get(handles.slider2,'Value') == get(handles.slider3,'Value')+1
     set(handles.slider3,'Enable','Off');
@@ -296,6 +296,8 @@ function pushbutton1_Callback(hObject, ~, handles)
 frame = round(get(handles.slider1,'Value'));
 frames = get(handles.slider1,'Max');
 
+set(handles.text15,'Visible','on');
+
 set(hObject,'Enable','Off');
 set(handles.slider1,'Enable','Off');
 set(handles.slider2,'Enable','Off');
@@ -313,6 +315,8 @@ set(handles.uitoggletool1,'Enable','Off');
 set(handles.uitoggletool2,'Enable','Off');
 set(handles.uitoggletool3,'Enable','Off');
 set(handles.playtoggle1,'Enable','Off');
+pause(.2)
+guidata(hObject,handles);
 
 filt = get(handles.popupmenu2,'Value');
 switch filt
@@ -360,6 +364,8 @@ set(handles.uitoggletool1,'Enable','On');
 set(handles.uitoggletool2,'Enable','On');
 set(handles.uitoggletool3,'Enable','On');
 set(handles.playtoggle1,'Enable','On');
+
+set(handles.text15,'Visible','off');
 
 guidata(hObject,handles);
 

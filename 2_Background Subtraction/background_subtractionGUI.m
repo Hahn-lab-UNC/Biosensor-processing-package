@@ -478,15 +478,31 @@ if filter
     % store old directory path and change to path of save file specified
     old_dir = cd(path_name);
     
-    % open the new text file
-    text = fopen(file_name,'w');
-    
-    % write the regions to the text file
-    fprintf(text,'background_box = [%d,%d,%d,%d]\nregion_box = [%d,%d,%d,%d]',...
-        bgr(1),bgr(2),bgr(3),bgr(4),roi(1),roi(2),roi(3),roi(4));
-    
-    % close text file
-    fclose(text);
+    for i=1:frames
+
+        im = handles.frames{i};
+
+        if get(handles.radiobutton1,'Value') == 1
+            % if automatic registration is selected
+            yoff_int = floor(yoff);
+            xoff_int = floor(xoff);
+
+            % whole pixel shift
+            se = translate(strel(1),[yoff_int xoff_int]);
+            r = imdilate(uint16(r),se);
+            % sub-pixel shift
+            r = subalign(r,xoff-xoff_int,yoff-yoff_int);
+            r = uint16(r);
+        else
+            % if manual registration is selected
+            se = translate(strel(1),[floor(yoff) floor(xoff)]);
+            r = uint16(imdilate(uint16(r),se));
+        end
+
+        % write the current frame to the save file
+        imwrite(r,file_name,'tif','Compression','none','WriteMode','append');
+
+    end
     
     % switch background_subtractionGUI to old directory
     cd(old_dir);

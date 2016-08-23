@@ -3,6 +3,11 @@ function masterScript
 %% --- Initial processing options --- %%
 opt = optionsGUI;
 
+if ~isstruct(opt)
+    disp('Image Processing Cancelled.')
+    return
+end
+
 num_fields = length(fieldnames(opt));
 if num_fields ~=12
     error('Image Processing Cancelled.');

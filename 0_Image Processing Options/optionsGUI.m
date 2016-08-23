@@ -22,7 +22,7 @@ function varargout = optionsGUI(varargin)
 
 % Edit the above text to modify the response to help optionsGUI
 
-% Last Modified by GUIDE v2.5 15-Aug-2016 14:30:35
+% Last Modified by GUIDE v2.5 23-Aug-2016 14:52:36
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -140,21 +140,7 @@ function checkbox10_Callback(hObject, ~, handles)
 state = get(hObject,'Value');
 handles.opts.filter = state;
 guidata(hObject,handles);
-function checkbox11_Callback(hObject, ~, handles)
-state = get(hObject,'Value');
-if state == 1
-    set(handles.edit1,'Enable','on');
-    set(handles.edit2,'Enable','on');
-else
-    set(handles.edit1,'Enable','off');
-    set(handles.edit2,'Enable','off');
-    set(handles.edit1,'String','0.00');
-    set(handles.edit2,'String','0.00');
-    handles.opts.alpha = 0.00;
-    handles.opts.beta = 0.00;
-end
-guidata(hObject,handles);
-    
+
 
 %% Push Buttons
 function pushbutton1_Callback(hObject, ~, handles)
@@ -176,6 +162,15 @@ function pushbutton2_Callback(hObject, ~, handles)
 handles.output = handles.opts;
 guidata(hObject,handles);
 set(handles.figure1,'Visible','off');
+function pushbutton3_Callback(hObject, ~, handles)
+set(handles.pushbutton2,'Enable','off');
+set(handles.pushbutton3,'Enable','off');
+[alpha,beta] = bleedthrough_correction;
+set(handles.edit1,'String',num2str(alpha));
+set(handles.edit2,'String',num2str(beta));
+set(handles.pushbutton2,'Enable','on');
+set(handles.pushbutton3,'Enable','on');
+guidata(hObject,handles);
 
 
 %% Radio Button Groups
@@ -194,8 +189,7 @@ guidata(hObject,handles);
 function uibuttongroup2_SelectionChangedFcn(hObject, ~, handles)
 state = get(hObject,'Tag');
 if strcmp(state,'radiobutton4')
-    set(handles.checkbox11,'Enable','off');
-    set(handles.checkbox11,'Value',0.0);
+    set(handles.pushbutton3,'Enable','off');
     handles.opts.svd = 1;
     set(handles.edit1,'Enable','off');
     set(handles.edit2,'Enable','off');
@@ -211,7 +205,7 @@ if strcmp(state,'radiobutton4')
     handles.opts.ratios(4) = 0;
 end
 if strcmp(state,'radiobutton5')
-    set(handles.checkbox11,'Enable','on');
+    set(handles.pushbutton3,'Enable','on');
     handles.opts.svd = 2;
     % Delete 2 lines below when config file is added
     set(handles.edit1,'Enable','on');
@@ -276,5 +270,7 @@ guidata(hObject,handles);
 
 
 %% Figure Close w/o Continuining Processing
-function figure1_CloseRequestFcn(~, ~, handles)
+function figure1_CloseRequestFcn(hObject, ~, handles)
+handles.output = 0;
+guidata(hObject,handles);
 set(handles.figure1,'Visible','off');
