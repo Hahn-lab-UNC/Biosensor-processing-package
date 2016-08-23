@@ -1,6 +1,0 @@
-build photobleach curve-displaying GUI
-build new bleedthrough correction GUI
-
-~format configuration file
-~build masking/thresholding GUI
-~~implement channel naming GUI
