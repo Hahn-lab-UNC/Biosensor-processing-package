@@ -67,6 +67,16 @@ handles.opts.orientation = 1;
 handles.opts.alpha = 0.00;
 handles.opts.beta = 0.00;
 
+if exist('bleedthrough_coeffs.txt','file') == 2
+    fid = fopen('bleedthrough_coeffs.txt','r');
+    str = fscanf(fid, '%c');
+    expression = 'alpha = (\d*[.]\d*)\nbeta = (\d*[.]\d*)';
+    tokens = regexp(str, expression, 'tokens');
+    set(handles.edit1,'String',tokens{1}{1});
+    set(handles.edit2,'String',tokens{1}{2});
+    fclose(fid);
+end
+
 % update handles
 guidata(hObject, handles);
 
@@ -211,10 +221,22 @@ if strcmp(state,'radiobutton5')
     set(handles.edit1,'Enable','on');
     set(handles.edit2,'Enable','on');
     %
-    set(handles.edit1,'String','0.00');
-    set(handles.edit2,'String','0.00');
-    handles.opts.alpha = 0.00;
-    handles.opts.beta = 0.00;
+    if exist('bleedthrough_coeffs.txt','file') == 2
+        fid = fopen('bleedthrough_coeffs.txt','r');
+        str = fscanf(fid, '%c');
+        expression = 'alpha = (\d*[.]\d*)\nbeta = (\d*[.]\d*)';
+        tokens = regexp(str, expression, 'tokens');
+        handles.opts.alpha = str2double(tokens{1}{1});
+        handles.opts.beta = str2double(tokens{1}{2});
+        set(handles.edit1,'String',tokens{1}{1});
+        set(handles.edit2,'String',tokens{1}{2});
+        fclose(fid);
+    else
+        handles.opts.alpha = 0.00;
+        handles.opts.beta = 0.00;
+        set(handles.edit1,'String','0.00');
+        set(handles.edit2,'String','0.00');
+    end
     set(handles.checkbox3,'Enable','on');
     set(handles.checkbox4,'Enable','on');
 end
