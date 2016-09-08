@@ -94,6 +94,7 @@ if isempty(get(handles.axes1,'Children')) % is the axes empty (i.e. have any 'Ch
     set(handles.CLim_Max_Tag, 'String', num2str(handles.CLim_Max)); % set the edit box 'CLim_Max_Tag' to the current CLim_val 'maximum'
     set(handles.CLim_Min_Tag, 'String', num2str(handles.CLim_Min)); % set the edit box 'CLim_Min_Tag' to the current CLim_val 'minimum'
     colorbar;
+    colormap('Hot');
     axis image % sets the aspect ratio so that the data units are the same in every direction and the plot box fits tightly around the data
 else
     imHandle = findobj(handles.axes1,'Type','image');
@@ -478,31 +479,11 @@ if filter
     % store old directory path and change to path of save file specified
     old_dir = cd(path_name);
     
-    for i=1:frames
-
-        im = handles.frames{i};
-
-        if get(handles.radiobutton1,'Value') == 1
-            % if automatic registration is selected
-            yoff_int = floor(yoff);
-            xoff_int = floor(xoff);
-
-            % whole pixel shift
-            se = translate(strel(1),[yoff_int xoff_int]);
-            r = imdilate(uint16(r),se);
-            % sub-pixel shift
-            r = subalign(r,xoff-xoff_int,yoff-yoff_int);
-            r = uint16(r);
-        else
-            % if manual registration is selected
-            se = translate(strel(1),[floor(yoff) floor(xoff)]);
-            r = uint16(imdilate(uint16(r),se));
-        end
-
-        % write the current frame to the save file
-        imwrite(r,file_name,'tif','Compression','none','WriteMode','append');
-
-    end
+    fid = fopen(file_name,'wt');
+    fprintf(fid,'background_Box = [%d,%d,%d,%d]',bgr(1),bgr(2),bgr(3),bgr(4));
+    fprintf(fid,'region_box = [%d,%d,%d,%d]',roi(1),roi(2),roi(3),roi(4));
+    
+    fclose(fid);
     
     % switch background_subtractionGUI to old directory
     cd(old_dir);
