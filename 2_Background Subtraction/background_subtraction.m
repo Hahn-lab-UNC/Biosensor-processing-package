@@ -9,7 +9,7 @@ while 1
         % * reads in region boxes and sets variables
         fid = fopen('region_boxes.txt', 'r');
         str = fscanf(fid, '%c');
-        expr1 = 'background_box = [(.*)\]';
+        expr1 = 'background_box = [(.*)\]r';
         expr2 = 'region_box = [(.*)\]';
         tokens1 = regexp(str, expr1, 'tokens');
         tokens2 = regexp(str, expr2, 'tokens');

@@ -571,6 +571,9 @@ switch filt
         filter_name = 'gauss_smooth';     
 end
 
+% get number of frames
+frames = get(handles.slider1,'Max');
+
 % prompt user with save box
 dlg_title = 'Save the Filtered Image to a ".tif" file';
 [file_name,path_name,filter] = uiputfile('*.tif',dlg_title,strcat('_',filter_name));
@@ -582,14 +585,14 @@ if filter
     for i=1:frames
 
         switch filt
-            case 1 % hybrid median filter
-                im_fil = hmf(handles.cur_unfil, str2double(get(handles.edit4,'String')));
-            case 2 % median filter
-                im_fil = medfilt2(handles.cur_unfil, [str2double(get(handles.edit4,'String')) str2double(get(handles.edit4,'String'))]);
-            case 3 % mean filter
-                im_fil = imboxfil(handles.cur_unfil, str2double(get(handles.edit4,'String')));
-            case 4 % gaussian smoothing
-                im_fil = imgaussfilt(handles.cur_unfil, str2double(get(handles.edit5,'String')));   
+            case 2 % hybrid median filter
+                im_fil = hmf(handles.frames_unfil{i}, str2double(get(handles.edit4,'String')));
+            case 3 % median filter
+                im_fil = medfilt2(handles.frames_unfil{i}, [str2double(get(handles.edit4,'String')) str2double(get(handles.edit4,'String'))]);
+            case 4 % mean filter
+                im_fil = imboxfilt(handles.frames_unfil{i}, str2double(get(handles.edit4,'String')));
+            case 5 % gaussian smoothing
+                im_fil = imgaussfilt(handles.frames_unfil{i}, str2double(get(handles.edit5,'String')));   
         end
 
         % write the current frame to the save file

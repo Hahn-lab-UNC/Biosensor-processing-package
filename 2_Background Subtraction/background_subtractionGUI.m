@@ -480,7 +480,7 @@ if filter
     old_dir = cd(path_name);
     
     fid = fopen(file_name,'wt');
-    fprintf(fid,'background_Box = [%d,%d,%d,%d]',bgr(1),bgr(2),bgr(3),bgr(4));
+    fprintf(fid,'background_box = [%d,%d,%d,%d]',bgr(1),bgr(2),bgr(3),bgr(4));
     fprintf(fid,'region_box = [%d,%d,%d,%d]',roi(1),roi(2),roi(3),roi(4));
     
     fclose(fid);
