@@ -807,7 +807,13 @@ if filter
         end
 
         % write the current frame to the save file
-        imwrite(r,file_name,'tif','Compression','none','WriteMode','append');
+        try 
+            imwrite(r,file_name,'tif','Compression','none','WriteMode','append');
+        catch
+            pause(1)
+            fprintf('DONORreg Iteration value: %i\n', j);
+            imwrite(r,file_name,'tif','Compression','none','WriteMode','append');
+        end
 
     end
 

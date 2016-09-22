@@ -134,7 +134,7 @@ if split == 1
     % * A larger value for 'loop' will decrease the memory load on Matlab, but will increase computation time
     % * A smaller value for 'loop' could produce memory errors but will decrease computation time 
 
-    loop = 9;       % number of subsection of frames
+    loop = 1;       % number of subsection of frames
     view_fig = 0;   % to view figures set to 1. 
 
     % set number of sub-sections to process sub-total number of frames in '.tif' stack
@@ -185,13 +185,30 @@ if split == 1
 
         % Write Donor and FRET to '.tif' files
         for j = 1:length(ind);
-            imwrite(donor(:,:,j), 'donor.tif', 'Compression', 'none', 'WriteMode', 'append')  % the raw donor images (donor excitation & emission)
+            try 
+                imwrite(donor(:,:,j), 'donor.tif', 'Compression', 'none', 'WriteMode', 'append')  % the raw donor images (donor excitation & emission)
+            catch
+                pause(1)
+                fprintf('DONORinit Iteration value: %i\n', j);
+                imwrite(donor(:,:,j), 'donor.tif', 'Compression', 'none', 'WriteMode', 'append')  % the raw donor images (donor excitation & emission)
+            end
+            
+            
             if transform == 1
                 imwrite(donor_transformed(:,:,j),  'donor_transformed.tif',  'Compression', 'none', 'WriteMode', 'append')  % the transformed donor images (donor excitation & emission)
             else
                 donor_transformed = donor;
             end
-            imwrite(FRET(:,:,j), 'fret.tif', 'Compression', 'none', 'WriteMode', 'append')  % the FRET images (donor excitation, acceptor emission)
+
+            
+            try 
+                imwrite(FRET(:,:,j), 'fret.tif', 'Compression', 'none', 'WriteMode', 'append')  % the FRET images (donor excitation, acceptor emission)
+            catch
+                pause(1)
+                fprintf('FRETinit Iteration value: %i\n', j);
+                imwrite(FRET(:,:,j), 'fret.tif', 'Compression', 'none', 'WriteMode', 'append')  % the FRET images (donor excitation, acceptor emission)
+            end
+            
         end
 
         % Apply the Normalized Shade Correction to Donor and FRET
@@ -214,8 +231,23 @@ if split == 1
 
         % Write the Shade Corrected Donor and FRET to '.tif' files
         for j = 1:length(ind);
-            imwrite(donor_sc(:,:,j),  'donor_sc.tif',  'Compression', 'none', 'WriteMode', 'append');
-            imwrite(FRET_sc(:,:,j), 'fret_sc.tif', 'Compression', 'none', 'WriteMode', 'append');
+            
+            try 
+                imwrite(donor_sc(:,:,j),  'donor_sc.tif',  'Compression', 'none', 'WriteMode', 'append');
+            catch
+                pause(1)
+                fprintf('DONORsc Iteration value: %i\n', j);
+                imwrite(donor_sc(:,:,j),  'donor_sc.tif',  'Compression', 'none', 'WriteMode', 'append');
+            end
+            
+            try 
+                imwrite(FRET_sc(:,:,j), 'fret_sc.tif', 'Compression', 'none', 'WriteMode', 'append');
+            catch
+                pause(1)
+                fprintf('FRETsc Iteration value: %i\n', j);
+                imwrite(FRET_sc(:,:,j), 'fret_sc.tif', 'Compression', 'none', 'WriteMode', 'append');
+            end
+
         end
 
         % Clear Unnecessary Variables

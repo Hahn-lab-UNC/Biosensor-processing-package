@@ -137,8 +137,22 @@ for i = 1:loop
     % Write the Shade Corrected, Background Subtracted donor and FRET
     % images to '.tif' files
     for j = 1:length(ind);
-        imwrite(donor_scbg(:,:,j), 'donor_scbg.tif',  'Compression', 'none', 'WriteMode', 'append');  % shade corrected, background subtracted donor images
-        imwrite(fret_scbg(:,:,j), 'fret_scbg.tif', 'Compression', 'none', 'WriteMode', 'append');  % shade corrected, background subtracted fret images       
+        try 
+            imwrite(donor_scbg(:,:,j), 'donor_scbg.tif',  'Compression', 'none', 'WriteMode', 'append');  % shade corrected, background subtracted donor images
+        catch
+            pause(1)
+            fprintf('DONORscbg Iteration value: %i\n', j);
+            imwrite(donor_scbg(:,:,j), 'donor_scbg.tif',  'Compression', 'none', 'WriteMode', 'append');  % shade corrected, background subtracted donor images
+        end
+
+        try 
+            imwrite(fret_scbg(:,:,j), 'fret_scbg.tif', 'Compression', 'none', 'WriteMode', 'append');  % shade corrected, background subtracted fret images       
+        catch
+            pause(1)
+            fprintf('FRETscbg Iteration value: %i\n', j);
+            imwrite(fret_scbg(:,:,j), 'fret_scbg.tif', 'Compression', 'none', 'WriteMode', 'append');  % shade corrected, background subtracted fret images       
+        end
+        
     end  
 
     % Acceptor Images
@@ -185,8 +199,21 @@ for i = 1:loop
     % Write the Cropped, Shade Corrected, Background Subtracted donor
     % and FRET images to '.tif' files
     for j = 1:length(ind);
-        imwrite(donor_scbg_roi(:,:,j), 'donor_scbg_roi.tif',  'Compression', 'none', 'WriteMode', 'append')
-        imwrite(fret_scbg_roi(:,:,j), 'fret_scbg_roi.tif', 'Compression', 'none', 'WriteMode', 'append')
+        try 
+            imwrite(donor_scbg_roi(:,:,j), 'donor_scbg_roi.tif',  'Compression', 'none', 'WriteMode', 'append')
+        catch
+            pause(1)
+            fprintf('DONOR Iteration value: %i\n', j);
+            imwrite(donor_scbg_roi(:,:,j), 'donor_scbg_roi.tif',  'Compression', 'none', 'WriteMode', 'append')
+        end
+        
+        try
+            imwrite(fret_scbg_roi(:,:,j), 'fret_scbg_roi.tif', 'Compression', 'none', 'WriteMode', 'append')
+        catch
+            pause(1)
+            fprintf('FRET Iteration value: %i\n', j);
+            imwrite(fret_scbg_roi(:,:,j), 'fret_scbg_roi.tif', 'Compression', 'none', 'WriteMode', 'append')
+        end            
     end
 
     % Reduce or clear unnecessary variables

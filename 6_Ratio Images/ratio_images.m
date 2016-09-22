@@ -145,7 +145,14 @@ for x=1:frames
         ratio_int_fd = uint16(ratio_fd);
 
         % Write ratio image
-        imwrite(ratio_int_fd,'ratio_fret_donor.tif','tif','Compression','none','WriteMode','append');
+        try 
+            imwrite(ratio_int_fd,'ratio_fret_donor.tif','tif','Compression','none','WriteMode','append');
+        catch
+            pause(1)
+            fprintf('FRETDONORratio Iteration value: %i\n', j);
+            imwrite(ratio_int_fd,'ratio_fret_donor.tif','tif','Compression','none','WriteMode','append');
+        end
+
     end
     if ratio_type(2) == 1
         % Calculate ratio images
@@ -159,9 +166,16 @@ for x=1:frames
         ratio_df = ratio_df*1000;
         ratio_df(ratio_df==Inf) = 0;
         ratio_int_df = uint16(ratio_df);
-
-        % Write ratio image
-        imwrite(ratio_int_df,'ratio_donor_fret.tif','tif','Compression','none','WriteMode','append');
+        
+        % Write ratio image        
+        try 
+            imwrite(ratio_int_df,'ratio_donor_fret.tif','tif','Compression','none','WriteMode','append');
+        catch
+            pause(1)
+            fprintf('DONORFRETratio Iteration value: %i\n', j);
+            imwrite(ratio_int_df,'ratio_donor_fret.tif','tif','Compression','none','WriteMode','append');
+        end
+        
     end
     if svd == 2
         if ratio_type(3) == 1

@@ -201,7 +201,14 @@ for x=1:frames
     donor_pbc = donor_Image.*CF_donor(x);
     donor_pbc = uint16(donor_pbc);
     
-    imwrite(donor_pbc,'donor_pbc.tif','tif','Compression','none','WriteMode','append');
+    try 
+        imwrite(donor_pbc,'donor_pbc.tif','tif','Compression','none','WriteMode','append');
+    catch
+        pause(1)
+        fprintf('DONORpbc Iteration value: %i\n', j);
+        imwrite(donor_pbc,'donor_pbc.tif','tif','Compression','none','WriteMode','append');
+    end
+
     
     % Write photobleach corrected fret
     fret_Image = fret_cell{x};
@@ -210,7 +217,13 @@ for x=1:frames
     fret_pbc = fret_Image.*CF_fret(x);
     fret_pbc = uint16(fret_pbc);
     
-    imwrite(fret_pbc,'fret_pbc.tif','tif','Compression','none','WriteMode','append');
+    try 
+        imwrite(fret_pbc,'fret_pbc.tif','tif','Compression','none','WriteMode','append');
+    catch
+        pause(1)
+        fprintf('FRETpbc Iteration value: %i\n', j);
+        imwrite(fret_pbc,'fret_pbc.tif','tif','Compression','none','WriteMode','append');
+    end
     
     % Write photobleach corrected acceptor
     if svd == 2

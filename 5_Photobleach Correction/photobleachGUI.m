@@ -371,7 +371,13 @@ if filter
         im_pbc = im.*handles.correction_factors(i);
         im_pbc = uint16(im_pbc);
 
-        imwrite(im_pbc,file_name,'tif','Compression','none','WriteMode','append');
+        try 
+            imwrite(im_pbc,file_name,'tif','Compression','none','WriteMode','append');
+        catch
+            pause(1)
+            fprintf('PHOTOBLEACH Iteration value: %i\n', j);
+            imwrite(im_pbc,file_name,'tif','Compression','none','WriteMode','append');
+        end
     end
     
     % switch to old directory

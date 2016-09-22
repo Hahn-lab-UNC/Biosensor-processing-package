@@ -161,8 +161,23 @@ for i = 1:loop
     
     %% Write the Masked Matrices to Images
     for j = 1:length(ind);
-        imwrite(donor_mk (:,:,j), 'donor_masked.tif', 'Compression', 'none', 'WriteMode', 'append');
-        imwrite(fret_mk(:,:,j), 'fret_masked.tif', 'Compression', 'none', 'WriteMode', 'append');
+        
+        try 
+            imwrite(donor_mk (:,:,j), 'donor_masked.tif', 'Compression', 'none', 'WriteMode', 'append');
+        catch
+            pause(1)
+            fprintf('DONORmask Iteration value: %i\n', j);
+            imwrite(donor_mk (:,:,j), 'donor_masked.tif', 'Compression', 'none', 'WriteMode', 'append');
+        end
+        
+        try 
+            imwrite(fret_mk(:,:,j), 'fret_masked.tif', 'Compression', 'none', 'WriteMode', 'append');
+        catch
+            pause(1)
+            fprintf('FRETmask Iteration value: %i\n', j);
+            imwrite(fret_mk(:,:,j), 'fret_masked.tif', 'Compression', 'none', 'WriteMode', 'append');
+        end
+        
         if svd == 2
             imwrite(acceptor_mk (:,:,j), 'acceptor_masked.tif', 'Compression', 'none', 'WriteMode', 'append');
         end
