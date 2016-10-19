@@ -161,7 +161,7 @@ if split == 1
             raw_imageA(:,:,find(ind==j,1,'first')) = imread(file_tif_donorfret, 'Index', j, 'Info', imgInfoA);
         end
 
-        % Split Excitation Images of Donor and FRET and Apply Dark Current Correction
+        % Split Excitation Images of Donor and FRET
         if orientation == 1
             FRET = raw_imageA(:, 1:round(width/2), :);
             donor = raw_imageA(:, round(width/2)+1:width, :);
@@ -170,6 +170,7 @@ if split == 1
             FRET = raw_imageA(:, round(width/2)+1:width, :);
         end
 
+        % Apply Dark Current Correction to Donor and FRET
         if dark_current == 1
             donor = bsxfun(@minus, donor, donor_dark);
             FRET = bsxfun(@minus, FRET, acceptor_dark);
@@ -268,14 +269,18 @@ if split == 1
                 raw_imageB(:,:,find(ind==j,1,'first')) = imread(file_tif_acceptor, 'Index', j, 'Info', imgInfoB);
             end
 
-            % Split Excitation Images of Acceptor and Apply Dark Current Correction
+            % Split Excitation Images of Acceptor
             if orientation == 1
                 acceptor = raw_imageB(:, 1:round(width/2), :);
             else
                 acceptor = raw_imageB(:, round(width/2)+1:width, :);
             end
-
-            acceptor = bsxfun(@minus, acceptor, acceptor_dark);
+            
+            % Apply Dark Current Correction to Acceptor
+            if dark_current == 1
+                acceptor = bsxfun(@minus, acceptor, acceptor_dark);
+            end
+            
             clear('raw_imageB')
 
             % Write Acceptor to '.tif' file
@@ -452,8 +457,10 @@ else
         end
 
         % Apply Dark Current Correction to Donor and FRET
-        donor = bsxfun(@minus, donor, donor_dark);
-        FRET = bsxfun(@minus, FRET, acceptor_dark);
+        if dark_current == 1
+            donor = bsxfun(@minus, donor, donor_dark);
+            FRET = bsxfun(@minus, FRET, acceptor_dark);
+        end
 
         % Apply the Transformation to the Donor Image
         [n,m,~] = size(donor);
@@ -514,8 +521,10 @@ else
                 acceptor(:,:,find(ind==j,1,'first')) = imread(file_tif_acceptor, 'Index', j, 'Info', imgInfoB);
             end
 
-            % Apply Dark Current Correction
-            acceptor = bsxfun(@minus, acceptor, acceptor_dark);
+            % Apply Dark Current Correction to Acceptor
+            if dark_current == 1
+                acceptor = bsxfun(@minus, acceptor, acceptor_dark);
+            end
 
             % Write Acceptor to '.tif' file
             for j = 1:length(ind);
