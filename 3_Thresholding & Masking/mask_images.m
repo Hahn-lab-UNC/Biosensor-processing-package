@@ -110,20 +110,20 @@ for i = 1:loop
     end  
     
     for j = ind
-        donor_matrix (:,:,find(ind==j,1,'first')) = imread(file_tifA, 'Index', j, 'Info', infoA);  % read the correct subsection of frames of image A
+        donor_matrix(:,:,find(ind==j,1,'first')) = imread(file_tifA, 'Index', j, 'Info', infoA);  % read the correct subsection of frames of image A
         fret_matrix(:,:,find(ind==j,1,'first')) = imread(file_tifB, 'Index', j, 'Info', infoB);  % read the correct subsection of frames of image B
         if svd == 2
-            acceptor_matrix (:,:,find(ind==j,1,'first')) = imread(file_tifC, 'Index', j, 'Info', infoA);  % read the correct subsection of frames of image C
+            acceptor_matrix(:,:,find(ind==j,1,'first')) = imread(file_tifC, 'Index', j, 'Info', infoC);  % read the correct subsection of frames of image C
         end
         
         if one_mask == 0
-            donor_mask (:,:,find(ind==j,1,'first')) = imread(file_tifD, 'Index', j, 'Info', infoD);  % read the correct subsection of frames of image D
-            fret_mask (:,:,find(ind==j,1,'first')) = imread(file_tifE, 'Index', j, 'Info', infoE);  % read the correct subsection of frames of image E
+            donor_mask(:,:,find(ind==j,1,'first')) = imread(file_tifD, 'Index', j, 'Info', infoD);  % read the correct subsection of frames of image D
+            fret_mask(:,:,find(ind==j,1,'first')) = imread(file_tifE, 'Index', j, 'Info', infoE);  % read the correct subsection of frames of image E
             if svd == 2
-                acceptor_mask (:,:,find(ind==j,1,'first')) = imread(file_tifF, 'Index', j, 'Info', infoD);  % read the correct subsection of frames of image F
+                acceptor_mask(:,:,find(ind==j,1,'first')) = imread(file_tifF, 'Index', j, 'Info', infoF);  % read the correct subsection of frames of image F
             end
         else
-            single_mask (:,:,find(ind==j,1,'first')) = imread(file_tifG, 'Index', j, 'Info', infoG);  % read the correct subsection of frames of image G
+            single_mask(:,:,find(ind==j,1,'first')) = imread(file_tifG, 'Index', j, 'Info', infoG);  % read the correct subsection of frames of image G
         end
     end
     
@@ -132,20 +132,20 @@ for i = 1:loop
         donor_mk = donor_matrix .* donor_mask;
         fret_mk = fret_matrix .* fret_mask;
         if svd == 2
-            acceptor_mk = donor_matrix .* acceptor_mask;
+            acceptor_mk = acceptor_matrix .* acceptor_mask;
         end
     else
         donor_mk = donor_matrix .* single_mask;
         fret_mk = fret_matrix .* single_mask;
         if svd == 2
-            acceptor_mk = donor_matrix .* single_mask;
+            acceptor_mk = acceptor_matrix .* single_mask;
         end
     end
     
     %%
     % Reduce or clear unnecessary variables
     if i == 1 && view_fig == 1
-        donor_matrix(:,:,2:end) = [];
+        donor_matrix(:,:,2:end) = []; %#ok<*NASGU>
         fret_matrix(:,:,2:end) = [];
     else
         clear('donor_matrix', 'fret_matrix');
@@ -163,11 +163,11 @@ for i = 1:loop
     for j = 1:length(ind);
         
         try 
-            imwrite(donor_mk (:,:,j), 'donor_masked.tif', 'Compression', 'none', 'WriteMode', 'append');
+            imwrite(donor_mk(:,:,j), 'donor_masked.tif', 'Compression', 'none', 'WriteMode', 'append');
         catch
             pause(1)
             fprintf('DONORmask Iteration value: %i\n', j);
-            imwrite(donor_mk (:,:,j), 'donor_masked.tif', 'Compression', 'none', 'WriteMode', 'append');
+            imwrite(donor_mk(:,:,j), 'donor_masked.tif', 'Compression', 'none', 'WriteMode', 'append');
         end
         
         try 
@@ -179,7 +179,13 @@ for i = 1:loop
         end
         
         if svd == 2
-            imwrite(acceptor_mk (:,:,j), 'acceptor_masked.tif', 'Compression', 'none', 'WriteMode', 'append');
+            try 
+                imwrite(acceptor_mk(:,:,j), 'acceptor_masked.tif', 'Compression', 'none', 'WriteMode', 'append');
+            catch
+                pause(1)
+                fprintf('ACCEPTORmask Iteration value: %i\n', j);
+                imwrite(acceptor_mk(:,:,j), 'acceptor_masked.tif', 'Compression', 'none', 'WriteMode', 'append');
+            end
         end
     end   
     

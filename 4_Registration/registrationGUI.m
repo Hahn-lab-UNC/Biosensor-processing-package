@@ -118,18 +118,12 @@ varargout{1} = handles.output;
 function auto_reg(bcell,rcell,frames)
 offsetval = zeros(frames,2);
 for i=1:frames
-    b = bcell{i};
-    r = rcell{i};
-
+    b = double(bcell{i});
+    r = double(rcell{i});
+    
     SS = size(b);
-    b = double(b);
-    r = double(r);
-
     picc_b = reshape(b,1,(SS(1)*SS(2)));
     picc_r = reshape(r,1,(SS(1)*SS(2)));
-
-    picc_b(picc_b>0) = 255;       
-    picc_r(picc_r>0) = 255;
 
     picc_b = reshape(picc_b, SS(1),SS(2));
     picc_r = reshape(picc_r, SS(1),SS(2));        
@@ -137,9 +131,10 @@ for i=1:frames
     %% Registration by Cross Correlation
     % r in relation to b
 
-    clear pic1 pic2 post*;
-    correlation = normxcorr2(picc_r, picc_b); % offset by correlation
+    correlation = normxcorr2(picc_b, picc_r); % offset by correlation
 
+    clear picc_b picc_r post*;
+    
     [xoffsetsub,yoffsetsub] = subpixShift(correlation);
     
     offsetval(i,2)= yoffsetsub;
@@ -172,7 +167,7 @@ if get(handles.radiobutton1,'Value') == 1
     r = uint16(r);
 else
     % if manual registration is selected
-    se = translate(strel(1),[-1*floor(yoff) floor(xoff)]);
+    se = translate(strel(1),[floor(yoff) floor(xoff)]);
     r = uint16(imdilate(uint16(r),se));
 end
 fuse_cell = getGlobal_fuses;
@@ -254,8 +249,8 @@ set(handles.CLim_Min_Tag2,'String',num2str(get(handles.slider4,'Value'))); % set
 guidata(hObject, handles);
 function slider5(hObject, ~, ~)
 handles = guidata(hObject);
-yo = get(handles.slider5,'Value');
-set(handles.edit1,'String',num2str(-1*round(yo)));
+yo = -1*get(handles.slider5,'Value');
+set(handles.edit1,'String',num2str(round(yo)));
 if get(handles.radiobutton1,'Value') ~= 1
     setGlobaly(yo);
     update_images(hObject,round(get(handles.slider7,'Value')));
@@ -786,7 +781,7 @@ if filter
         handles.curImage_r = handles.frames_r{i};
         r = handles.curImage_r;
 
-        yoff = getGlobaly*-1;
+        yoff = getGlobaly;
         xoff = getGlobalx;
 
         if get(handles.radiobutton1,'Value') == 1
@@ -811,7 +806,7 @@ if filter
             imwrite(r,file_name,'tif','Compression','none','WriteMode','append');
         catch
             pause(1)
-            fprintf('DONORreg Iteration value: %i\n', j);
+            fprintf('DONORreg Iteration value: %i\n', i);
             imwrite(r,file_name,'tif','Compression','none','WriteMode','append');
         end
 

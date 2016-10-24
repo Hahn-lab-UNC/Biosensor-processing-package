@@ -126,9 +126,15 @@ for x=1:frames
         acceptor = double(acceptor_cell{x});
         % Bleedthrough correction for fret channel with dual chain biosensor analysis
         corrected_fret = fret - (donor*alpha)-(acceptor*beta);
-        corrected_fret_int = uint16(corrected_fret);
-        imwrite(corrected_fret_int,'fret_corrected.tif','tif','Compression','none','WriteMode','append');
         fret = corrected_fret;
+        corrected_fret_int = uint16(corrected_fret);
+        try 
+            imwrite(corrected_fret_int,'fret_corrected.tif','tif','Compression','none','WriteMode','append');
+        catch
+            pause(1)
+            fprintf('FRET_CORRECTED Iteration value: %i\n', x);
+            imwrite(corrected_fret_int,'fret_corrected.tif','tif','Compression','none','WriteMode','append');
+        end
     end
     
     if ratio_type(1) == 1
@@ -149,7 +155,7 @@ for x=1:frames
             imwrite(ratio_int_fd,'ratio_fret_donor.tif','tif','Compression','none','WriteMode','append');
         catch
             pause(1)
-            fprintf('FRETDONORratio Iteration value: %i\n', j);
+            fprintf('FRETDONORratio Iteration value: %i\n', x);
             imwrite(ratio_int_fd,'ratio_fret_donor.tif','tif','Compression','none','WriteMode','append');
         end
 
@@ -172,7 +178,7 @@ for x=1:frames
             imwrite(ratio_int_df,'ratio_donor_fret.tif','tif','Compression','none','WriteMode','append');
         catch
             pause(1)
-            fprintf('DONORFRETratio Iteration value: %i\n', j);
+            fprintf('DONORFRETratio Iteration value: %i\n', x);
             imwrite(ratio_int_df,'ratio_donor_fret.tif','tif','Compression','none','WriteMode','append');
         end
         

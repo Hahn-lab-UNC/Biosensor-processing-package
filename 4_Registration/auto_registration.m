@@ -35,20 +35,16 @@ for x=1:frames
     if size(aa_r)~=size(aa_b)
         error('FRET image does not match size of donor image.')
     end
-
-    SS = size(aa_r);
+    
     aa_r = double(aa_r);
     aa_b = double(aa_b);
-
+    
+    SS = size(aa_r);
     picc_r = reshape(aa_r,1,(SS(1)*SS(2)));
     picc_b = reshape(aa_b,1,(SS(1)*SS(2)));
 
-    picc_r(picc_r>0) = 255;       
-    picc_b(picc_b>0) = 255;
-
     picc_r = reshape(picc_r, SS(1),SS(2));
     picc_b = reshape(picc_b, SS(1),SS(2));        
-
 
     %% Registration by Cross Correlation
     % FRET in relation to donor
@@ -58,7 +54,7 @@ for x=1:frames
 
     [xoffsetsub,yoffsetsub] = subpixShift(correlation);
 
-    offsetval(x,1)= xoffsetsub; %#ok<*SAGROW>
+    offsetval(x,1)= xoffsetsub; %#ok<*AGROW>
     offsetval(x,2)= yoffsetsub;
 end
 
