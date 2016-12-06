@@ -197,8 +197,15 @@ for x=1:frames
             ratio_fa(ratio_fa==Inf) = 0;
             ratio_int_fa = uint16(ratio_fa);
 
-            % Write ratio image
-            imwrite(ratio_int_fa,'ratio_fret_acceptor.tif','tif','Compression','none','WriteMode','append');
+            % Write ratio image     
+            try 
+                imwrite(ratio_int_fa,'ratio_fret_acceptor.tif','tif','Compression','none','WriteMode','append');
+            catch
+                pause(1)
+                fprintf('FRETACCEPTORratio Iteration value: %i\n', x);
+                imwrite(ratio_int_fa,'ratio_fret_acceptor.tif','tif','Compression','none','WriteMode','append');
+            end
+            
         end
         if ratio_type(4) == 1
             % Calculate ratio images
@@ -214,7 +221,14 @@ for x=1:frames
             ratio_int_af = uint16(ratio_af);
 
             % Write ratio image
-            imwrite(ratio_int_af,'ratio_acceptor_fret.tif','tif','Compression','none','WriteMode','append');
+            try 
+                imwrite(ratio_int_af,'ratio_acceptor_fret.tif','tif','Compression','none','WriteMode','append');
+            catch
+                pause(1)
+                fprintf('ACCEPTORFRETratio Iteration value: %i\n', x);
+                imwrite(ratio_int_af,'ratio_acceptor_fret.tif','tif','Compression','none','WriteMode','append');
+            end     
+     
         end
     end
 end
