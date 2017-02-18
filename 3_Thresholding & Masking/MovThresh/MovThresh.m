@@ -22,7 +22,7 @@ function varargout = MovThresh(varargin)
 
 % Edit the above text to modify the response to help MovThresh
 
-% Last Modified by GUIDE v2.5 17-Feb-2017 16:56:43
+% Last Modified by GUIDE v2.5 18-Feb-2017 13:05:37
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;

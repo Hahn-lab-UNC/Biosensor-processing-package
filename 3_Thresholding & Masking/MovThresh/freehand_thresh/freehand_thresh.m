@@ -22,7 +22,7 @@ function varargout = freehand_thresh(varargin)
 
 % Edit the above text to modify the response to help freehand_thresh
 
-% Last Modified by GUIDE v2.5 17-Feb-2017 15:44:24
+% Last Modified by GUIDE v2.5 18-Feb-2017 13:08:04
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
