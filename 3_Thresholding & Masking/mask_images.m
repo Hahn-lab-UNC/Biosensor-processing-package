@@ -1,4 +1,4 @@
-function mask_images(svd, one_mask)
+function mask_images(svd, one_mask, foi)
 
 %% Breakup donor, FRET, and acceptor Images Into Managable Number of Frames
 % Matlab has limited memory and therefore a maximum possible array size
@@ -9,9 +9,11 @@ function mask_images(svd, one_mask)
 % * A larger value for 'loop' will decrease the memory load on Matlab, but will increase computation time
 % * A smaller value for 'loop' could produce memory errors but will decrease computation time 
 
-loop = 6;       % number of subsection of frames
-view_fig = 0;   % to view figures set to 1. 
+loop = 6;       % number of subsection of frames to process at a time
+view_fig = 0;   % to view figures set to 1
 
+% record frames of interest in 'run_opts.mat'
+save('run_opts.mat','foi','-append');
 
 % import necessary images into variables
 file_tifA = 'donor_scbg_roi.tif';
@@ -53,7 +55,7 @@ infoB = imfinfo(file_tifB);
 
 mImage = infoA(1).Width;   % number of pixels in the X direction 
 nImage = infoA(1).Height;  % number of pixels in the Y direction 
-num_images = length(infoA);  % total number of frames in '.tif' stack
+num_images = length(foi);  % total number of frames in '.tif' stack
 
 if one_mask == 0
     infoD = imfinfo(file_tifD);
@@ -110,10 +112,10 @@ for i = 1:loop
     end  
     
     for j = ind
-        donor_matrix(:,:,find(ind==j,1,'first')) = imread(file_tifA, 'Index', j, 'Info', infoA);  % read the correct subsection of frames of image A
-        fret_matrix(:,:,find(ind==j,1,'first')) = imread(file_tifB, 'Index', j, 'Info', infoB);  % read the correct subsection of frames of image B
+        donor_matrix(:,:,find(ind==j,1,'first')) = imread(file_tifA, 'Index', foi(j), 'Info', infoA);  % read the correct subsection of frames of image A
+        fret_matrix(:,:,find(ind==j,1,'first')) = imread(file_tifB, 'Index', foi(j), 'Info', infoB);  % read the correct subsection of frames of image B
         if svd == 2
-            acceptor_matrix(:,:,find(ind==j,1,'first')) = imread(file_tifC, 'Index', j, 'Info', infoC);  % read the correct subsection of frames of image C
+            acceptor_matrix(:,:,find(ind==j,1,'first')) = imread(file_tifC, 'Index', foi(j), 'Info', infoC);  % read the correct subsection of frames of image C
         end
         
         if one_mask == 0

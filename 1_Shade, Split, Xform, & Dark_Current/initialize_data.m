@@ -7,16 +7,16 @@ function initialize_data(svd, dark_current, orientation, transform, split)
 %  '.tif' file.
 
 % * Tries to find the specific '.tif' files and delete them.
-try  %#ok<*TRYNC>
-    delete('donor.tif');   % donor image
-end
-try
-    delete('fret.tif');  % FRET image
-end
-try
-    delete('acceptor.tif');  % acceptor image
-end
-try
+% try  
+%     delete('donor.tif');   % donor image
+% end
+% try
+%     delete('fret.tif');  % FRET image
+% end
+% try
+%     delete('acceptor.tif');  % acceptor image
+% end
+try %#ok<*TRYNC>
     delete('donor_sc.tif');   % shade corrected donor image
 end
 try
@@ -33,78 +33,264 @@ end
 if split == 1
     %% --- Split Initialization
     %% - Select Data to Import
+    if exists('img_data.mat','file') == 2
+        % Construct a questdlg with three options
+        choice = questdlg('An "image data" file was found in the working path. Would you like to use these images or select new images?', ...
+            'Select Images', ...
+            'Use "img_data.mat"','Select New Images','Use "img_data.mat"');
+        % Handle response
+        switch choice
+            case 'Use "img_data.mat"'
+                run = load('img_data.mat');
+                imgs = run.imgage_data{1,1};
+                
+                file_tif_donorfret = imgs.donorfret;
+                file_donorfret_shade = imgs.donorfret_shade;
 
-    file_tif_donorfret = uigetfile('*.tif','Select the donor/FRET movie');
-    file_donorfret_shade = uigetfile('*.tif','Selectthe donor/FRET shade image');
+                imgInfoA = imfinfo(file_tif_donorfret);
+                width = imgInfoA(1).Width;
+                height = imgInfoA(1).Height; 
+                num_images = length(imgInfoA);
 
-    imgInfoA = imfinfo(file_tif_donorfret);
-    width = imgInfoA(1).Width;
-    height = imgInfoA(1).Height; 
-    num_images = length(imgInfoA);
+                if svd == 2
+                    file_tif_acceptor = imgs.acceptor;
+                    file_acceptor_shade = imgs.acceptor_shade;
 
-    if svd == 2
-        file_tif_acceptor = uigetfile('*.tif','Select the acceptor movie');
-        file_acceptor_shade = uigetfile('*.tif','Select the acceptor shade image');
+                    imgInfoB = imfinfo(file_tif_acceptor);
+                end
 
-        imgInfoB = imfinfo(file_tif_acceptor);
-    end
+                % Format Shade Correction Images
+                shadeInfoA = imfinfo(file_donorfret_shade);
+                raw_shadeA = zeros(height, width, 'uint16');
+                raw_shadeA(:,:) = imread(file_donorfret_shade, 'Info', shadeInfoA);
 
-    % Format Shade Correction Images
-    shadeInfoA = imfinfo(file_donorfret_shade);
-    raw_shadeA = zeros(height, width, 'uint16');
-    raw_shadeA(:,:) = imread(file_donorfret_shade, 'Info', shadeInfoA);
+                if svd == 2
+                    shadeInfoB = imfinfo(file_acceptor_shade);
+                    raw_shadeB = zeros(height, width, 'uint16');
+                    raw_shadeB(:,:) = imread(file_acceptor_shade, 'Info', shadeInfoB);
+                end
 
-    if svd == 2
-        shadeInfoB = imfinfo(file_acceptor_shade);
-        raw_shadeB = zeros(height, width, 'uint16');
-        raw_shadeB(:,:) = imread(file_acceptor_shade, 'Info', shadeInfoB);
-    end
+                if orientation == 1
+                    fret_shade = raw_shadeA(:, 1:round(width/2) );
+                    donor_shade = raw_shadeA(:, round(width/2+1):width );
 
-    if orientation == 1
-        fret_shade = raw_shadeA(:, 1:round(width/2) );
-        donor_shade = raw_shadeA(:, round(width/2+1):width );
+                    if svd == 2
+                        acceptor_shade = raw_shadeB(:, 1:round(width/2) );
+                    end
+                else
+                    donor_shade = raw_shadeA(:, 1:round(width/2) );
+                    fret_shade = raw_shadeA(:, round(width/2+1):width );
 
-        if svd == 2
-            acceptor_shade = raw_shadeB(:, 1:round(width/2) );
+                    if svd == 2
+                        acceptor_shade = raw_shadeB(:, round(width/2+1):width );
+                    end
+                end
+
+                % Format Dark Current Images
+                if dark_current == 1
+                    file_donorfret_dark = imgs.donorfret_dark;
+
+                    darkInfo = imfinfo(file_donorfret_dark);
+                    raw_dark = zeros(height, width, 'uint16');
+                    raw_dark(:,:) = imread(file_donorfret_dark, 'Info', darkInfo);
+
+                    if orientation == 1
+                        acceptor_dark  = raw_dark(:, 1:round(width/2) );
+                        donor_dark     = raw_dark(:, round(width/2+1):width );
+                    else
+                        donor_dark     = raw_dark(:, 1:round(width/2) );
+                        acceptor_dark  = raw_dark(:, round(width/2+1):width );
+                    end
+
+                    donor_shade = donor_shade - donor_dark;
+                    fret_shade = fret_shade - acceptor_dark;
+                    if svd == 2
+                        acceptor_shade = acceptor_shade - acceptor_dark;
+                    end
+                end
+
+                % Format Transformtion Matrix
+                if transform == 1
+                %     file_tform = uigetfile('transform.mat','Select the transformation matrix');
+                    trans_matrix = imgs.trans_matrix;
+                end 
+                
+            case 'Select New Images'
+                disp('Select New Images...')
+                
+                file_tif_donorfret = uigetfile('*.tif','Select the donor/FRET movie');
+                file_donorfret_shade = uigetfile('*.tif','Selectthe donor/FRET shade image');
+
+                imgs = struct;
+                imgs.donorfret = file_tif_donorfret;
+                imgs.donorfret_shade = file_donorfret_shade;
+
+                imgInfoA = imfinfo(file_tif_donorfret);
+                width = imgInfoA(1).Width;
+                height = imgInfoA(1).Height; 
+                num_images = length(imgInfoA);
+
+                if svd == 2
+                    file_tif_acceptor = uigetfile('*.tif','Select the acceptor movie');
+                    file_acceptor_shade = uigetfile('*.tif','Select the acceptor shade image');
+
+                    imgs.acceptor = file_tif_acceptor;
+                    imgs.acceptor_shade = file_tif_acceptor;
+
+                    imgInfoB = imfinfo(file_tif_acceptor);
+                end
+
+                % Format Shade Correction Images
+                shadeInfoA = imfinfo(file_donorfret_shade);
+                raw_shadeA = zeros(height, width, 'uint16');
+                raw_shadeA(:,:) = imread(file_donorfret_shade, 'Info', shadeInfoA);
+
+                if svd == 2
+                    shadeInfoB = imfinfo(file_acceptor_shade);
+                    raw_shadeB = zeros(height, width, 'uint16');
+                    raw_shadeB(:,:) = imread(file_acceptor_shade, 'Info', shadeInfoB);
+                end
+
+                if orientation == 1
+                    fret_shade = raw_shadeA(:, 1:round(width/2) );
+                    donor_shade = raw_shadeA(:, round(width/2+1):width );
+
+                    if svd == 2
+                        acceptor_shade = raw_shadeB(:, 1:round(width/2) );
+                    end
+                else
+                    donor_shade = raw_shadeA(:, 1:round(width/2) );
+                    fret_shade = raw_shadeA(:, round(width/2+1):width );
+
+                    if svd == 2
+                        acceptor_shade = raw_shadeB(:, round(width/2+1):width );
+                    end
+                end
+
+                % Format Dark Current Images
+                if dark_current == 1
+                    file_donorfret_dark = uigetfile('*.tif','Select the dark current image');
+
+                    imgs.donorfret_dark = file_donorfret_dark;
+
+                    darkInfo = imfinfo(file_donorfret_dark);
+                    raw_dark = zeros(height, width, 'uint16');
+                    raw_dark(:,:) = imread(file_donorfret_dark, 'Info', darkInfo);
+
+                    if orientation == 1
+                        acceptor_dark  = raw_dark(:, 1:round(width/2) );
+                        donor_dark     = raw_dark(:, round(width/2+1):width );
+                    else
+                        donor_dark     = raw_dark(:, 1:round(width/2) );
+                        acceptor_dark  = raw_dark(:, round(width/2+1):width );
+                    end
+
+                    donor_shade = donor_shade - donor_dark;
+                    fret_shade = fret_shade - acceptor_dark;
+                    if svd == 2
+                        acceptor_shade = acceptor_shade - acceptor_dark;
+                    end
+                end
+
+                % Format Transformtion Matrix
+                if transform == 1
+                %     file_tform = uigetfile('transform.mat','Select the transformation matrix');
+                    trans_matrix = importdata('camera_transform.mat');
+
+                    imgs.trans_matrix = trans_matrix;
+                end
+                
+                image_data = {imgs}; %#ok<NASGU>
+                save('img_data.mat', 'image_data')
         end
     else
-        donor_shade = raw_shadeA(:, 1:round(width/2) );
-        fret_shade = raw_shadeA(:, round(width/2+1):width );
+        
+        file_tif_donorfret = uigetfile('*.tif','Select the donor/FRET movie');
+        file_donorfret_shade = uigetfile('*.tif','Selectthe donor/FRET shade image');
+
+        imgs = struct;
+        imgs.donorfret = file_tif_donorfret;
+        imgs.donorfret_shade = file_donorfret_shade;
+
+        imgInfoA = imfinfo(file_tif_donorfret);
+        width = imgInfoA(1).Width;
+        height = imgInfoA(1).Height; 
+        num_images = length(imgInfoA);
 
         if svd == 2
-            acceptor_shade = raw_shadeB(:, round(width/2+1):width );
+            file_tif_acceptor = uigetfile('*.tif','Select the acceptor movie');
+            file_acceptor_shade = uigetfile('*.tif','Select the acceptor shade image');
+
+            imgs.acceptor = file_tif_acceptor;
+            imgs.acceptor_shade = file_tif_acceptor;
+
+            imgInfoB = imfinfo(file_tif_acceptor);
         end
-    end
 
-    % Format Dark Current Images
-    if dark_current == 1
-        file_donorfret_dark = uigetfile('*.tif','Select the dark current image');
+        % Format Shade Correction Images
+        shadeInfoA = imfinfo(file_donorfret_shade);
+        raw_shadeA = zeros(height, width, 'uint16');
+        raw_shadeA(:,:) = imread(file_donorfret_shade, 'Info', shadeInfoA);
 
-        darkInfo = imfinfo(file_donorfret_dark);
-        raw_dark = zeros(height, width, 'uint16');
-        raw_dark(:,:) = imread(file_donorfret_dark, 'Info', darkInfo);
+        if svd == 2
+            shadeInfoB = imfinfo(file_acceptor_shade);
+            raw_shadeB = zeros(height, width, 'uint16');
+            raw_shadeB(:,:) = imread(file_acceptor_shade, 'Info', shadeInfoB);
+        end
 
         if orientation == 1
-            acceptor_dark  = raw_dark(:, 1:round(width/2) );
-            donor_dark     = raw_dark(:, round(width/2+1):width );
+            fret_shade = raw_shadeA(:, 1:round(width/2) );
+            donor_shade = raw_shadeA(:, round(width/2+1):width );
+
+            if svd == 2
+                acceptor_shade = raw_shadeB(:, 1:round(width/2) );
+            end
         else
-            donor_dark     = raw_dark(:, 1:round(width/2) );
-            acceptor_dark  = raw_dark(:, round(width/2+1):width );
+            donor_shade = raw_shadeA(:, 1:round(width/2) );
+            fret_shade = raw_shadeA(:, round(width/2+1):width );
+
+            if svd == 2
+                acceptor_shade = raw_shadeB(:, round(width/2+1):width );
+            end
         end
 
-        donor_shade = donor_shade - donor_dark;
-        fret_shade = fret_shade - acceptor_dark;
-        if svd == 2
-            acceptor_shade = acceptor_shade - acceptor_dark;
+        % Format Dark Current Images
+        if dark_current == 1
+            file_donorfret_dark = uigetfile('*.tif','Select the dark current image');
+
+            imgs.donorfret_dark = file_donorfret_dark;
+
+            darkInfo = imfinfo(file_donorfret_dark);
+            raw_dark = zeros(height, width, 'uint16');
+            raw_dark(:,:) = imread(file_donorfret_dark, 'Info', darkInfo);
+
+            if orientation == 1
+                acceptor_dark  = raw_dark(:, 1:round(width/2) );
+                donor_dark     = raw_dark(:, round(width/2+1):width );
+            else
+                donor_dark     = raw_dark(:, 1:round(width/2) );
+                acceptor_dark  = raw_dark(:, round(width/2+1):width );
+            end
+
+            donor_shade = donor_shade - donor_dark;
+            fret_shade = fret_shade - acceptor_dark;
+            if svd == 2
+                acceptor_shade = acceptor_shade - acceptor_dark;
+            end
         end
-    end
 
-    % Format Transformtion Matrix
-    if transform == 1
-    %     file_tform = uigetfile('transform.mat','Select the transformation matrix');
-        trans_matrix = importdata('camera_transform.mat');
-    end
+        % Format Transformtion Matrix
+        if transform == 1
+        %     file_tform = uigetfile('transform.mat','Select the transformation matrix');
+            trans_matrix = importdata('camera_transform.mat');
 
+            imgs.trans_matrix = trans_matrix;
+        end
+
+        image_data = {imgs}; %#ok<NASGU>
+        save('img_data.mat', 'image_data')
+    
+    end
 
     %% - Configure Shade Images
 
@@ -351,54 +537,198 @@ if split == 1
 else
     %% --- No Split Initialization
     %% - Select Data to Import
+    if exist('img_data.mat','file') == 2
+        % Construct a questdlg with three options
+        choice = questdlg('An "image data" file was found in the working path. Would you like to use these images or select new images?', ...
+            'Select Images', ...
+            'Use "img_data.mat"','Select New Images','Use "img_data.mat"');
+        % Handle response
+        switch choice
+            case 'Use "img_data.mat"'
+                disp('Using images from "img_data.mat".')
+                run = load('img_data.mat');
+                imgs = run.image_data{1,1};
+                
+                file_tif_donor = imgs.donor;
+                file_tif_fret = imgs.fret;
+                file_donor_shade = imgs.donor_shade;
+                file_fret_shade = imgs.fret_shade;
 
-    file_tif_donor = uigetfile('*.tif','Select the donor movie');
-    file_tif_fret = uigetfile('*.tif','Select the FRET movie');
-    file_donor_shade = uigetfile('*.tif','Select the donor shade image');
-    file_fret_shade = uigetfile('*.tif','Select the FRET shade image');
+                imgInfoA = imfinfo(file_tif_donor);
+                width = imgInfoA(1).Width;
+                height = imgInfoA(1).Height; 
+                num_images = length(imgInfoA);
 
-    imgInfoA = imfinfo(file_tif_donor);
-    width = imgInfoA(1).Width;
-    height = imgInfoA(1).Height; 
-    num_images = length(imgInfoA);
+                if svd == 2
+                    file_tif_acceptor = imgs.acceptor;
+                    file_acceptor_shade = imgs.acceptor_shade;
 
-    if svd == 2
-        file_tif_acceptor = uigetfile('*.tif','Select the acceptor movie');
-        file_acceptor_shade = uigetfile('*.tif','Select the acceptor shade image');
+                    imgInfoB = imfinfo(file_tif_acceptor);
+                end
 
-        imgInfoB = imfinfo(file_tif_acceptor);
-    end
+                % Format Shade Correction Images
+                donor_shade = imread(file_donor_shade);
+                fret_shade = imread(file_fret_shade);
 
-    % Format Shade Correction Images
-    donor_shade = imread(file_donor_shade);
-    fret_shade = imread(file_fret_shade);
+                if svd == 2
+                    acceptor_shade = imread(file_acceptor_shade);
+                end
 
-    if svd == 2
-        acceptor_shade = imread(file_acceptor_shade);
-    end
+                % Format Dark Current Images
+                if dark_current == 1
+                    file_donor_dark = imgs.donor_dark;
+                    file_acceptor_dark = imgs.acceptor_dark;
+                    
+                    acceptor_dark  = imread(file_acceptor_dark);
+                    donor_dark     = imread(file_donor_dark);
 
-    % Format Dark Current Images
-    if dark_current == 1
-        file_donor_dark = uigetfile('*.tif','Select the dark current image for the donor channel');
-        file_acceptor_dark = uigetfile('*.tif','Select the dark current image for the acceptor channel');
+                    donor_shade = donor_shade - donor_dark;
+                    fret_shade = fret_shade - acceptor_dark;
+                    if svd == 2
+                        acceptor_shade = acceptor_shade - acceptor_dark;
+                    end
+                end
 
-        acceptor_dark  = imread(file_acceptor_dark);
-        donor_dark     = imread(file_donor_dark);
+                % Format Transformtion Matrix
+                if transform == 1
+                %     file_tform = uigetfile('*.mat','Select the transformation matrix');
+                    trans_matrix = imgs.trans_matrix;
 
-        donor_shade = donor_shade - donor_dark;
-        fret_shade = fret_shade - acceptor_dark;
-        if svd == 2
-            acceptor_shade = acceptor_shade - acceptor_dark;
+                end
+                
+            case 'Select New Images'
+                disp('Select new images...')
+                
+                file_tif_donor = uigetfile('*.tif','Select the donor movie');
+                file_tif_fret = uigetfile('*.tif','Select the FRET movie');
+                file_donor_shade = uigetfile('*.tif','Select the donor shade image');
+                file_fret_shade = uigetfile('*.tif','Select the FRET shade image');
+
+                imgs = struct;
+                imgs.donor = file_tif_donor;
+                imgs.fret = file_tif_fret;
+                imgs.donor_shade = file_donor_shade;
+                imgs.fret_shade = file_fret_shade;
+
+                imgInfoA = imfinfo(file_tif_donor);
+                width = imgInfoA(1).Width;
+                height = imgInfoA(1).Height; 
+                num_images = length(imgInfoA);
+
+                if svd == 2
+                    file_tif_acceptor = uigetfile('*.tif','Select the acceptor movie');
+                    file_acceptor_shade = uigetfile('*.tif','Select the acceptor shade image');
+
+                    imgs.acceptor = file_tif_acceptor;
+                    imgs.acceptor_shade = file_acceptor_shade;
+
+                    imgInfoB = imfinfo(file_tif_acceptor);
+                end
+
+                % Format Shade Correction Images
+                donor_shade = imread(file_donor_shade);
+                fret_shade = imread(file_fret_shade);
+
+                if svd == 2
+                    acceptor_shade = imread(file_acceptor_shade);
+                end
+
+                % Format Dark Current Images
+                if dark_current == 1
+                    file_donor_dark = uigetfile('*.tif','Select the dark current image for the donor channel');
+                    file_acceptor_dark = uigetfile('*.tif','Select the dark current image for the acceptor channel');
+
+                    imgs.donor_dark = file_donor_dark;
+                    imgs.acceptor_dark = file_acceptor_dark;
+
+                    acceptor_dark  = imread(file_acceptor_dark);
+                    donor_dark     = imread(file_donor_dark);
+
+                    donor_shade = donor_shade - donor_dark;
+                    fret_shade = fret_shade - acceptor_dark;
+                    if svd == 2
+                        acceptor_shade = acceptor_shade - acceptor_dark;
+                    end
+                end
+
+                % Format Transformtion Matrix
+                if transform == 1
+                %     file_tform = uigetfile('*.mat','Select the transformation matrix');
+                    trans_matrix = importdata('camera_transform.mat');
+
+                    imgs.trans_matrix = trans_matrix;
+                end
+
+                image_data = {imgs}; %#ok<NASGU>
+                save('img_data.mat', 'image_data')
         end
+    else
+        
+        file_tif_donor = uigetfile('*.tif','Select the donor movie');
+        file_tif_fret = uigetfile('*.tif','Select the FRET movie');
+        file_donor_shade = uigetfile('*.tif','Select the donor shade image');
+        file_fret_shade = uigetfile('*.tif','Select the FRET shade image');
+
+        imgs = struct;
+        imgs.donor = file_tif_donor;
+        imgs.fret = file_tif_fret;
+        imgs.donor_shade = file_donor_shade;
+        imgs.fret_shade = file_fret_shade;
+
+        imgInfoA = imfinfo(file_tif_donor);
+        width = imgInfoA(1).Width;
+        height = imgInfoA(1).Height; 
+        num_images = length(imgInfoA);
+
+        if svd == 2
+            file_tif_acceptor = uigetfile('*.tif','Select the acceptor movie');
+            file_acceptor_shade = uigetfile('*.tif','Select the acceptor shade image');
+
+            imgs.acceptor = file_tif_acceptor;
+            imgs.acceptor_shade = file_acceptor_shade;
+
+            imgInfoB = imfinfo(file_tif_acceptor);
+        end
+
+        % Format Shade Correction Images
+        donor_shade = imread(file_donor_shade);
+        fret_shade = imread(file_fret_shade);
+
+        if svd == 2
+            acceptor_shade = imread(file_acceptor_shade);
+        end
+
+        % Format Dark Current Images
+        if dark_current == 1
+            file_donor_dark = uigetfile('*.tif','Select the dark current image for the donor channel');
+            file_acceptor_dark = uigetfile('*.tif','Select the dark current image for the acceptor channel');
+
+            imgs.donor_dark = file_donor_dark;
+            imgs.acceptor_dark = file_acceptor_dark;
+
+            acceptor_dark  = imread(file_acceptor_dark);
+            donor_dark     = imread(file_donor_dark);
+
+            donor_shade = donor_shade - donor_dark;
+            fret_shade = fret_shade - acceptor_dark;
+            if svd == 2
+                acceptor_shade = acceptor_shade - acceptor_dark;
+            end
+        end
+
+        % Format Transformtion Matrix
+        if transform == 1
+        %     file_tform = uigetfile('*.mat','Select the transformation matrix');
+            trans_matrix = importdata('camera_transform.mat');
+
+            imgs.trans_matrix = trans_matrix;
+        end
+
+        image_data = {imgs}; %#ok<NASGU>
+        save('img_data.mat', 'image_data')
+        
     end
-
-    % Format Transformtion Matrix
-    if transform == 1
-    %     file_tform = uigetfile('*.mat','Select the transformation matrix');
-        trans_matrix = importdata('camera_transform.mat');
-    end
-
-
+    
     %% - Configure Shade Images
 
     [n,m] = size(donor_shade);

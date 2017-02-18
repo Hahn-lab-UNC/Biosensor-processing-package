@@ -22,7 +22,7 @@ function varargout = MovThresh(varargin)
 
 % Edit the above text to modify the response to help MovThresh
 
-% Last Modified by GUIDE v2.5 14-Mar-2013 21:35:25
+% Last Modified by GUIDE v2.5 17-Feb-2017 16:56:43
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -43,19 +43,21 @@ else
 end
 % End initialization code - DO NOT EDIT
 
-
 function MovThresh_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to MovThresh (see VARARGIN)
+set(handles.main_window,'Resize','On');
+set(handles.main_window,'Visible','On');
 
 % Choose default command line output for MovThresh
-handles.output = hObject;
+handles.output = 0;
 
+% GUI handles
+handles.frames_of_interest = 0;
 
-% Global variables
 handles.IMAGECELL = 0; % Cell of thresholded images
 handles.NUM_ELEMENTS = 0; % Number of frames in the multi-page tiff file
 handles.IMAGE_NUMBER = 1; % Position of the current image in the image cell
@@ -66,6 +68,9 @@ handles.CUST_Y=0;
 handles.CUST_LINE = 0;
 handles.GAUSSIAN = 0;
 handles.DEFAULT_GAUSSIAN = 0;
+handles.HORZ_VALUE = 0;
+handles.HORZ_LINE = 0;
+handles.cust_or_horz = 0;
 handles.LastSel = 1;
 handles.REDLINE = 0; 
 handles.X = 0; % Array of time points.
@@ -83,6 +88,7 @@ handles.lismove1=addlistener(handles.movieSlider, 'Value', 'PostSet', @(src, eve
 handles.lismove2=addlistener(handles.movieSlider, 'Value', 'PostSet', @(src, event)replot(hObject, src, event));
 handles.lisdraw1=addlistener(handles.drawerSlider, 'Value', 'PostSet', @(src, event)redrawMean(hObject, src, event));
 handles.lisdraw5=addlistener(handles.drawerSlider, 'Value', 'PostSet', @(src, event)translateSmooth(hObject, src, event));
+handles.lisdraw6=addlistener(handles.drawerSlider, 'Value', 'PostSet', @(src, event)translateHorizontal(hObject, src, event));
 handles.lisdraw2=addlistener(handles.drawerSlider, 'Value', 'PostSet', @(src, event)readjustFrame(hObject, src, event));
 
 % handles.lismove1=event.listener(handles.movieSlider, 'PostSet', @(src, event)switchImage(hObject, src, event));
@@ -109,6 +115,7 @@ set(handles.reset, 'Enable', 'off');
 set(handles.gaussian, 'Enable', 'off');
 set(handles.custom, 'Enable', 'off');
 set(handles.suggested, 'Enable', 'off');
+set(handles.horizontal, 'Enable', 'off');
 set(handles.opt, 'Enable', 'off');
 set(handles.save_as, 'Enable', 'off');
 set(handles.threshold_range, 'Enable', 'off');
@@ -116,20 +123,17 @@ set(handles.threshold_range, 'Enable', 'off');
 set(handles.boost,'Enable','off');
 set(handles.edit_smoo,'Enable','off');
 
-warning('off','MATLAB:HandleGraphics:ObsoletedProperty:JavaFrame');
+% warning('off','MATLAB:HandleGraphics:ObsoletedProperty:JavaFrame');
 
 guidata(hObject, handles);
 
-function varargout = MovThresh_OutputFcn(hObject, eventdata, handles) 
-% varargout  cell array for returning output args (see VARARGOUT);
-% hObject    handle to figure
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% wait for main_window to be deleted
+waitfor(handles.main_window,'Resize','Off');
 
-% Get default command line output from handles structure
+function varargout = MovThresh_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
+delete(handles.main_window);
 % -------------------------------------------------------------------------
-
 
 
 % --- Function for Listeners ----------------------------------------------
@@ -170,6 +174,10 @@ function switchImage(hObject, src, event)
         
     elseif(get(handles.custom, 'Value') == 1)
         thresh = handles.CUST_VALUES(handles.IMAGE_NUMBER);
+        
+    elseif(get(handles.horizontal, 'Value') == 1)
+        thresh = handles.HORZ_VALUE(1);
+        
     end
     
     str=sprintf('Threshold = %.2f',thresh);
@@ -204,10 +212,12 @@ function replot(hObject, src, event)
             handles.lisdraw1.Enabled = 'off';
             handles.lisdraw2.Enabled = 'off';
             handles.lisdraw5.Enabled = 'off';
+            handles.lisdraw6.Enabled = 'off';
         else
             handles.lisdraw1.Enabled = 0;
             handles.lisdraw2.Enabled = 0;
             handles.lisdraw5.Enabled = 0;
+            handles.lisdraw6.Enabled - 0;
         end
 %         handles.lisdraw1.Enabled = 'off';
 %         handles.lisdraw2.Enabled = 'off';
@@ -223,16 +233,20 @@ function replot(hObject, src, event)
             set(handles.drawerSlider, 'Value', handles.CUST_VALUES(value));
         elseif (get(handles.gaussian, 'Value') == 1)
             set(handles.drawerSlider, 'Value', handles.gaussianSavedSliderValue);
+        elseif (get(handles.horizontal, 'Value') == 1)
+            set(handles.drawerSlider, 'Value', handles.HORZ_VALUE(1));
         end
         
         if Strcmpc(version('-release'),'2014b') < 0 
             handles.lisdraw1.Enabled = 'on';
             handles.lisdraw2.Enabled = 'on';
             handles.lisdraw5.Enabled = 'on';
+            handles.lisdraw6.Enabled = 'on';
         else
             handles.lisdraw1.Enabled = 1;
             handles.lisdraw2.Enabled = 1;
             handles.lisdraw5.Enabled = 1;
+            handles.lisdraw6.Enabled = 1;
         end
 %         handles.lisdraw1.Enabled = 'on';
 %         handles.lisdraw2.Enabled = 'on';
@@ -321,7 +335,6 @@ function redrawMean(hObject, src, event)
     guidata(hObject, handles);
 
 function translateSmooth(hObject, src, event)
-    
 
     handles = guidata(hObject);    
     newValue = event.AffectedObject.Value;
@@ -348,6 +361,33 @@ function translateSmooth(hObject, src, event)
     end
     
     guidata(hObject, handles);
+
+function translateHorizontal(hObject, src, event)
+
+    handles = guidata(hObject);    
+    newValue = event.AffectedObject.Value;
+    
+    if (get(handles.horizontal, 'Value') ~= 1)
+        return;
+    end
+    
+    if (newValue ~= handles.HORZ_VALUE(1))
+        handles.HORZ_VALUE = [newValue newValue];
+
+        axes(handles.histogramLoc);
+        if ~ishandle(handles.HORZ_LINE) || handles.HORZ_LINE == 0            
+            return;
+        end
+        
+        delete(handles.HORZ_LINE);
+        xrange = [1 handles.NUM_ELEMENTS];
+        yrange = [handles.HORZ_VALUE];
+        handles.HORZ_LINE = line('Xdata', xrange, 'YData', yrange, 'Color', 'k', 'Marker','o','MarkerFaceColor','r','MarkerSize',4, 'Parent',handles.histogramLoc); 
+        str=sprintf('Threshold = %.2f',handles.HORZ_VALUE(1));
+        set(handles.threshInt, 'String', str);
+    end
+    
+    guidata(hObject, handles);  
     
 function readjustFrame(hObject, src, event)
 % --- If the drawer slider is moved directly after thresholding a single 
@@ -395,7 +435,7 @@ function readjustFrame(hObject, src, event)
 
 
 
-% --- Additional functions ------------------------------------------------
+% --- Additional Functions ------------------------------------------------
 function import(hObject,boost)
 % --- Imports a multi-page tiff image from a given directory and thresholds it by frame. 
     
@@ -448,6 +488,7 @@ function import(hObject,boost)
         set(handles.gaussian, 'Enable', 'off');
         set(handles.custom, 'Enable', 'off');
         set(handles.suggested, 'Enable', 'off');
+        set(handles.horizontal, 'Enable', 'off');
         set(handles.opt, 'Enable', 'off');
         set(handles.save_as, 'Enable', 'off');
         set(handles.threshold_range, 'Enable', 'off');
@@ -463,12 +504,14 @@ function import(hObject,boost)
             handles.lisdraw1.Enabled = 'off';
             handles.lisdraw2.Enabled = 'off';
             handles.lisdraw5.Enabled = 'off';
+            handles.lisdraw6.Enabled = 'off';
         else
             handles.lismove1.Enabled = 0;
             handles.lismove2.Enabled = 0;
             handles.lisdraw1.Enabled = 0;
             handles.lisdraw2.Enabled = 0;
             handles.lisdraw5.Enabled = 0;
+            handles.lisdraw6.Enabled = 0;
         end
 %         set(handles.lismove1, 'Enable', 'off');
 %         set(handles.lismove2, 'Enable', 'off');
@@ -495,7 +538,13 @@ function import(hObject,boost)
             handles.IMAGE_NUMBER = 1;
 
             info = imfinfo([pathname filename]);
-            handles.NUM_ELEMENTS = numel(info);   
+            handles.NUM_ELEMENTS = numel(info); 
+            
+            handles.frames_of_interest = zeros(handles.NUM_ELEMENTS,1);
+            for i = 1:handles.NUM_ELEMENTS
+                handles.frames_of_interest(i) = i;
+            end
+            guidata(hObject,handles);
                         
             if handles.NUM_ELEMENTS>1
 
@@ -563,6 +612,8 @@ function import(hObject,boost)
                 handles.CUST_VALUES = repmat(handles.MEAN, 1, handles.NUM_ELEMENTS);
                 handles.CUST_X=[1 handles.NUM_ELEMENTS];
                 handles.CUST_Y=[handles.MEAN handles.MEAN];
+                
+                handles.HORZ_VALUE = [handles.MEAN handles.MEAN];
 
                 axes(handles.histogramLoc);
                 hold on;
@@ -624,6 +675,7 @@ function import(hObject,boost)
                 set(handles.gaussian, 'Enable', 'on');
                 set(handles.custom, 'Enable', 'on');
                 set(handles.suggested, 'Enable', 'on');
+                set(handles.horizontal, 'Enable', 'on');
                 set(handles.opt, 'Enable', 'on');
                 set(handles.save_as, 'Enable', 'on');
                 set(handles.edit_smoo, 'Enable', 'off', 'String', ' ');
@@ -635,12 +687,14 @@ function import(hObject,boost)
             handles.lisdraw1.Enabled = 'on';
             handles.lisdraw2.Enabled = 'on';
             handles.lisdraw5.Enabled = 'on';
+            handles.lisdraw6.Enabled = 'on';
         else
             handles.lismove1.Enabled = 1;
             handles.lismove2.Enabled = 1;
             handles.lisdraw1.Enabled = 1;
             handles.lisdraw2.Enabled = 1;
             handles.lisdraw5.Enabled = 1;
+            handles.lisdraw6.Enabled = 1;
         end
 %                 set(handles.lismove1, 'Enable', 'on');
 %                 set(handles.lismove2, 'Enable', 'on');
@@ -853,18 +907,23 @@ function thresholdBySuggested(hObject)
     b = cell(1,handles.NUM_ELEMENTS);
     
     for k = 1:handles.NUM_ELEMENTS
-       axes(handles.progress1);
-       cla;     
-       bx=[0 k k 0 0]/handles.NUM_ELEMENTS;
-       by=[0 0 1 1 0];
-       fill(bx,by,[.7 .7 .7]);
-       set(handles.progress1,'Box','on','XLim',[0 1],'YLim',[0 1],'XTick',[],'YTick',[]);
-       pause(0.001); 
-       %set(handles.Frame,'String',['Frame # ' num2str(k)]);
-       set(handles.Frame,'String',['Frame # ' num2str(k) ' (' num2str(handles.NUM_ELEMENTS) ')']);
+        axes(handles.progress1);
+        cla;     
+        bx=[0 k k 0 0]/handles.NUM_ELEMENTS;
+        by=[0 0 1 1 0];
+        fill(bx,by,[.7 .7 .7]);
+        set(handles.progress1,'Box','on','XLim',[0 1],'YLim',[0 1],'XTick',[],'YTick',[]);
+        pause(0.001); 
+        %set(handles.Frame,'String',['Frame # ' num2str(k)]);
+        set(handles.Frame,'String',['Frame # ' num2str(k) ' (' num2str(handles.NUM_ELEMENTS) ')']);
                    
-       image = handles.IMAGECELL{k};
-       b{k}=thresholdByValue(hObject, image, suggested(k));             
+        image = handles.IMAGECELL{k};
+        if (get(handles.horizontal, 'Value') == 1)
+            handles.LastSel = 4;
+            b{k}=thresholdByValue(hObject, image, handles.HORZ_VALUE(1));
+        else
+            b{k}=thresholdByValue(hObject, image, suggested(k));
+        end
     end
     cla(handles.progress1,'reset');    
     set(handles.progress1,'Box','on','XTick',[],'YTick',[],'Visible','off');
@@ -977,25 +1036,33 @@ function reset_Callback(hObject, eventdata, handles)
 % intensity plot to a horizontal line where the intensity at all times is 
 % the mean threshold point.
 
-    for k = 1:handles.NUM_ELEMENTS
-        handles.CUST_VALUES(k) = handles.MEAN;
-    end    
-    %---DT---
-    handles.CUST_X=[1 handles.NUM_ELEMENTS];
-    handles.CUST_Y=[handles.MEAN handles.MEAN];
-    %--------
-    
     axes(handles.histogramLoc);
-    if ishandle(handles.CUST_LINE)
-        if(handles.CUST_LINE ~= 0)
-            delete(handles.CUST_LINE);
+    if handles.cust_or_horz == 0
+        if ishandle(handles.CUST_LINE)
+            for k = 1:handles.NUM_ELEMENTS
+                handles.CUST_VALUES(k) = handles.MEAN;
+            end    
+            handles.CUST_X=[1 handles.NUM_ELEMENTS];
+            handles.CUST_Y=[handles.MEAN handles.MEAN];
+            if(handles.CUST_LINE ~= 0)
+                delete(handles.CUST_LINE);
+            end
+            handles.CUST_LINE = line('XData', handles.CUST_X, 'YData', handles.CUST_Y, 'Color','k','Marker','o','MarkerFaceColor','r','MarkerSize',4);
+            set(handles.drawerSlider, 'Value', handles.CUST_VALUES(handles.IMAGE_NUMBER));   
+        end
+    else
+        if ishandle(handles.HORZ_LINE)
+            handles.HORZ_VALUE = [handles.MEAN handles.MEAN];
+            if(handles.HORZ_LINE ~= 0)
+                delete(handles.HORZ_LINE);
+            end
+            xrange = [1 handles.NUM_ELEMENTS];
+            yrange = [handles.HORZ_VALUE];
+            handles.HORZ_LINE = line('XData', xrange, 'YData', yrange, 'Color','k', 'Marker','o','MarkerFaceColor','r','MarkerSize',4);
+            set(handles.drawerSlider, 'Value', handles.HORZ_VALUE(1));
         end
     end
-    
-    handles.CUST_LINE = line('XData', handles.CUST_X, 'YData', handles.CUST_Y, 'Color','k','Marker','o','MarkerFaceColor','r','MarkerSize',4);
-    
     guidata(hObject, handles);
-    set(handles.drawerSlider, 'Value', handles.CUST_VALUES(handles.IMAGE_NUMBER));    
 
 function re_threshold_Callback(hObject, eventdata, handles)
 % --- Executes on button press in re_threshold. Re-thresholds the entire
@@ -1200,6 +1267,20 @@ function threshold_range_Callback(hObject, eventdata, handles)
     if jWindow~=0
         set(handle(jWindow),'Enabled',true);
     end
+    
+function manualMaskDraw_Callback(hObject, eventdata, handles)
+task = questdlg('Selecting this option will close the current GUI and you will not be able to return. Are you sure you wish to continue on to manually draw masks?', ...
+        'WARNING!', ...
+        'Return to Current GUI','Continue on to Drawing Masks','Return to Current GUI');
+if strcmp(task,'Return to Current GUI')
+    return
+else
+    set(handles.main_window,'Visible','Off');
+    handles.frames_of_interest = freehand_thresh;
+    handles.output = handles.frames_of_interest;
+    set(handles.main_window,'Resize','Off');
+    guidata(hObject,handles);
+end
 % -------------------------------------------------------------------------    
 
 
@@ -1219,6 +1300,8 @@ function curves_SelectionChangeFcn(hObject, eventdata, handles)
             if ishandle(handles.CUST_LINE)
                 if(handles.CUST_LINE ~= 0) 
                     delete(handles.CUST_LINE);
+                elseif(handles.HORZ_LINE ~= 0)
+                    delete(handles.HORZ_LINE);
                 end
             end
             % restore
@@ -1241,9 +1324,12 @@ function curves_SelectionChangeFcn(hObject, eventdata, handles)
             if ishandle(handles.CUST_LINE)
                 if(handles.CUST_LINE ~= 0) 
                     delete(handles.CUST_LINE);
+                elseif(handles.HORZ_LINE ~= 0)
+                    delete(handles.HORZ_LINE);
+                    handles.HORZ_LINE = 0;
                 end
             end
-            
+            handles.cust_or_horz = 0;
             %restore
             %set(handles.drawerSlider, 'Value', handles.customSavedSliderValue);
             set(handles.drawerSlider, 'Value', handles.CUST_VALUES(handles.IMAGE_NUMBER));
@@ -1265,6 +1351,9 @@ function curves_SelectionChangeFcn(hObject, eventdata, handles)
                 if(handles.CUST_LINE ~= 0) 
                     delete(handles.CUST_LINE);
                     handles.CUST_LINE = 0;
+                elseif(handles.HORZ_LINE ~= 0)
+                    delete(handles.HORZ_LINE);
+                    handles.HORZ_LINE = 0;
                 end
             end
             str=sprintf('Threshold = %.2f',handles.Y(handles.IMAGE_NUMBER));
@@ -1276,6 +1365,29 @@ function curves_SelectionChangeFcn(hObject, eventdata, handles)
             
             set(handles.smoo_text,'ForegroundColor',[.5 .5 .5]);
             set(handles.edit_smoo,'Enable','off','String','  ');
+            
+            
+        case 'horizontal'
+            if ishandle(handles.CUST_LINE)
+                if(handles.CUST_LINE ~= 0) 
+                    delete(handles.CUST_LINE);
+                    handles.CUST_LINE = 0;
+                elseif(handles.HORZ_LINE ~= 0)
+                    delete(handles.HORZ_LINE);
+                end
+            end
+            set(handles.drawerSlider, 'Value', handles.HORZ_VALUE(1));   
+            handles.cust_or_horz = 1;
+            str=sprintf('Threshold = %.2f',handles.HORZ_VALUE(1));
+            xrange = [1 handles.NUM_ELEMENTS];
+            yrange = [handles.HORZ_VALUE];
+            handles.HORZ_LINE = line('Xdata', xrange, 'YData', yrange, 'Color', 'k', 'Marker','o','MarkerFaceColor','r','MarkerSize',4, 'Parent',handles.histogramLoc); 
+            set(handles.threshInt, 'String', str);
+            set(handles.drawerSlider, 'Enable', 'on');
+            set(handles.remove_single, 'Enable', 'off'); % there should be no pivots on horizontal line
+            set(handles.reset, 'Enable', 'on');
+            set(handles.threshold_range, 'Enable', 'off'); % no range for 1 threshold value
+            
             
         otherwise
     
@@ -1338,11 +1450,11 @@ function edit_smoo_CreateFcn(hObject, eventdata, handles)
     if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
         set(hObject,'BackgroundColor','white');
     end
-% -------------------------------------------------------------------------    
+% -------------------------------------------------------------------------
 
 
 
-% --- Manu ----------------------------------------------------------------
+% --- Menu ----------------------------------------------------------------
 function file_Callback(hObject, eventdata, handles)
 
 function importMovie_Callback(hObject, eventdata, handles)
@@ -1361,6 +1473,12 @@ function save_as_Callback(hObject, eventdata, handles)
             thresh=handles.GAUSSIAN;
         elseif handles.LastSel==3
             thresh=handles.CUST_VALUES;
+        elseif handles.LastSel==4
+            tval=handles.HORZ_VALUE(1);
+            thresh=zeros(handles.NUM_ELEMENTS,1);
+            for i=1:handles.NUM_ELEMENTS
+                thresh(i)=tval;
+            end
         end  
        
         axes(handles.progress1);
@@ -1761,6 +1879,7 @@ function algo_Callback(hObject, eventdata, handles)
     handles.lisdraw1.Enabled = 0;
     handles.lisdraw2.Enabled = 0;
     handles.lisdraw5.Enabled = 0;
+    handles.lisdraw6.Enabled = 0;
     
     set(handles.drawerSlider, 'Enable','off');
     set(handles.smoo_text,'ForegroundColor',[.5 .5 .5]);
@@ -1861,10 +1980,14 @@ function algo_Callback(hObject, eventdata, handles)
     handles.lisdraw1.Enabled = 1;
     handles.lisdraw2.Enabled = 1;
     handles.lisdraw5.Enabled = 1;
+    handles.lisdraw6.Enabled = 1;
     
     guidata(hObject, handles);
-                 
-% -------------------------------------------------------------------------    
+% -------------------------------------------------------------------------
+    
+
+    
+% --- Thresh Range Options ------------------------------------------------   
 
 function set_initial_min_thresh(val)
     handles=guidata(gcf);
@@ -1971,8 +2094,11 @@ function update_thresh_range()
 
 function min_thresh_range_Callback(hObject, eventdata, handles)
 update_thresh_range();
+% -------------------------------------------------------------------------
 
-% --- Executes during object creation, after setting all properties.
+
+
+% --- Executes during object creation, after setting all properties--------
 function min_thresh_range_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -1980,9 +2106,21 @@ end
 
 function max_thresh_range_Callback(hObject, eventdata, handles)
 update_thresh_range();
+% -------------------------------------------------------------------------
 
-% --- Executes during object creation, after setting all properties.
+
+
+% --- Executes during object creation, after setting all properties--------
 function max_thresh_range_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+
+% --- Executes on Close Window---------------------------------------------
+function main_window_CloseRequestFcn(hObject, eventdata, handles)
+handles.output = handles.frames_of_interest;
+guidata(hObject,handles);
+set(handles.main_window,'Resize','Off');
+% -------------------------------------------------------------------------

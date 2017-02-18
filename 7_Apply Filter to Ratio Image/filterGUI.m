@@ -449,8 +449,12 @@ if ~isempty(get(handles.axes1,'Children'))
     set(handles.playtoggle1,'Enable','Off');
 end
 
+go = 1;
 [file, path] = uigetfile('*.tif','Select a ".tif" file to open');
 if file == 0
+    go = 0;
+end
+if go == 0 && ~isempty(get(handles.axes1,'Children'))
     set(handles.slider1,'Enable','On');
     set(handles.slider2,'Enable','On');
     set(handles.slider3,'Enable','On');
@@ -465,6 +469,8 @@ if file == 0
     set(handles.uitoggletool3,'Enable','On');
     set(handles.playtoggle1,'Enable','On');
     return;
+elseif go == 0 && isempty(get(handles.axes1,'Children'))
+    return
 end
 
 % get image information
@@ -543,7 +549,6 @@ handles.cur_fil = handles.frames_fil{1};
 guidata(hObject,handles);
 
 function save_tag_Callback(hObject, ~, handles)
-
 set(handles.slider1,'Enable','Off');
 set(handles.slider2,'Enable','Off');
 set(handles.slider3,'Enable','Off');

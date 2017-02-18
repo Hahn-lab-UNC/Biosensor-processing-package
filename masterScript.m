@@ -1,7 +1,28 @@
 function masterScript
 
 %% --- Initial processing options --- %%
-opt = optionsGUI;
+% check if run_opts.config exists
+if exist('run_opts.mat','file') == 2
+    % Construct a questdlg with three options
+    choice = questdlg('A "run options" file was found in the working path. Would you like to use the options from this file, or select new options?', ...
+        'Options Configuration', ...
+        'Use "run_opts.mat"','Select New Options','Cancel','Cancel');
+    % Handle response
+    switch choice
+        case 'Use "run_opts.mat"'
+            disp('Using options from "run_opts.mat".')
+            run = load('run_opts.mat');
+            opt = run.opts{1,1};
+        case 'Select New Options'
+            disp('Select new options...')
+            opt = optionsGUI;
+        case 'Cancel'
+            disp('Exiting Processing.')
+            return
+    end
+else
+    opt = optionsGUI;
+end
 
 if ~isstruct(opt)
     disp('Image Processing Cancelled.')
@@ -56,8 +77,8 @@ addpath(genpath(working_dir));
 if align_cameras == 1
      if exist('camera_transform.mat','file') ~= 2
          disp('Starting Camera Transformation-Matrix Creation GUI...');
-         transformCreationGUI;
-         input('Enter anything to continue\n','s');
+         handle = transformCreationGUI;
+         waitfor(handle);
      end
 end
 
@@ -74,9 +95,9 @@ background_subtraction(single_vs_dual);
 
 %% --- Apply threshold masks --- %%
 disp('Starting Thresholding/Masking GUI...');
-handle = MovThresh;
-waitfor(handle);
-mask_images(single_vs_dual,one_mask);
+frames_of_interest = MovThresh;
+waitfor(frames_of_interest);
+mask_images(single_vs_dual,one_mask,frames_of_interest);
 
 
 %% --- Registration --- %%

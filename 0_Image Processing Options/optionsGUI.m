@@ -160,6 +160,8 @@ end
 guidata(hObject,handles);
 function pushbutton2_Callback(hObject, ~, handles)
 handles.output = handles.opts;
+opts = {handles.opts}; %#ok<NASGU>
+save('run_opts.mat', 'opts')
 guidata(hObject,handles);
 set(handles.figure1,'Visible','off');
 function pushbutton3_Callback(hObject, ~, handles)
@@ -281,7 +283,7 @@ handles.opts.beta = beta_out;
 guidata(hObject,handles);
 
 
-%% Figure Close w/o Continuining Processing
+%% Figure Close w/o Continuing Processing
 function figure1_CloseRequestFcn(hObject, ~, handles)
 handles.output = 0;
 guidata(hObject,handles);
