@@ -104,20 +104,23 @@ set(handles.edit1,'Enable','off');
 set(handles.edit2,'Enable','off');
 set(handles.edit3,'Enable','off');
 set(handles.edit4,'Enable','off');
+set(handles.text14,'Visible','On');
 
 % construct a questdlg about names of saved files
 task = questdlg(sprintf(['Please select a formatting option for saved file names:\n\n', ...
-                 'Option1:  left_filename.type  right_filename.type\n', ...
-                 'Option2:  left_001.type       right_001.type']), ...
+                 'Option1:    left_filename.type    right_filename.type\n', ...
+                 'Option2:    left_001.type         right_001.type\n', ...
+                 'Option3:    left_.type            right_.type\n']), ...
     'WARNING!', ...
-    'Option1','Option2','Option2');
-if strcmp(task,'Option2')
+    'Option1','Option2','Option3','Option3');
+if strcmp(task,'Option1')
+    buildnameopt = 1;
+elseif strcmp(task,'Option2')
     buildnameopt = 2;
 else
-    buildnameopt = 1;
+    buildnameopt = 3;
 end
 
-set(handles.text14,'Visible','On');
 tic
 % read in image data
 for file = 1:handles.num_im
@@ -168,20 +171,24 @@ for file = 1:handles.num_im
             [left_name,right_name] = build_file_name(file,handles.left_name,handles.right_name,filename,...
                                                      buildnameopt,handles);
             % save left image data
-            save_left_name = fullfile(handles.save_dir,[left_name,'.',format]);
-            try 
-                imwrite(left(:,:,frame),save_left_name,'Compression','none','WriteMode','append')
-            catch
-                pause(.5)
-                imwrite(left(:,:,frame),save_left_name,'Compression','none','WriteMode','append')
+            if handles.keep_left == 1
+                save_left_name = fullfile(handles.save_dir,[left_name,'.',format]);
+                try 
+                    imwrite(left(:,:,frame),save_left_name,'Compression','none','WriteMode','append')
+                catch
+                    pause(.5)
+                    imwrite(left(:,:,frame),save_left_name,'Compression','none','WriteMode','append')
+                end
             end
             % save right image data
-            save_right_name = fullfile(handles.save_dir,[right_name,'.',format]);
-            try 
-                imwrite(right(:,:,frame),save_right_name,'Compression','none','WriteMode','append')
-            catch
-                pause(.5)
-                imwrite(right(:,:,frame),save_right_name,'Compression','none','WriteMode','append')
+            if handles.keep_right == 1
+                save_right_name = fullfile(handles.save_dir,[right_name,'.',format]);
+                try 
+                    imwrite(right(:,:,frame),save_right_name,'Compression','none','WriteMode','append')
+                catch
+                    pause(.5)
+                    imwrite(right(:,:,frame),save_right_name,'Compression','none','WriteMode','append')
+                end
             end
         end
         
@@ -209,7 +216,11 @@ rmpath(handles.working_dir);
 function [built_left,built_right] = build_file_name(idx,left_name,right_name,original,option,handles)
 order = length(num2str(handles.num_im));
 lead_zeros = order - length(num2str(idx));
-if option == 2
+if option == 1
+    original = original(1:length(original)-4);
+    built_left = [left_name,original];
+    built_right = [right_name,original];
+elseif option == 2
     built_name = '';
     for i = 1:lead_zeros
         built_name = [built_name,'0']; %#ok<AGROW>
@@ -217,8 +228,8 @@ if option == 2
     built_left = [left_name,built_name,num2str(idx)];
     built_right = [right_name,built_name,num2str(idx)];
 else
-    built_left = [left_name,original];
-    built_right = [right_name,original];
+    built_left = left_name;
+    built_right = right_name;
 end
 
 
@@ -331,12 +342,26 @@ if get(hObject,'Value') == 1
 else
     handles.keep_left = 0;
 end
+if handles.num_im>0
+    if get(hObject,'Value') == 0 && get(handles.checkbox2,'Value') == 0
+        set(handles.pushbutton1,'Enable','off');
+    else
+        set(handles.pushbutton1,'Enable','on');
+    end
+end
 guidata(hObject,handles);
 function checkbox2_Callback(hObject, ~, handles)
 if get(hObject,'Value') == 1
     handles.keep_right = 1;
 else
     handles.keep_right = 0;
+end
+if handles.num_im>0
+    if get(hObject,'Value') == 0 && get(handles.checkbox1,'Value') == 0
+        set(handles.pushbutton1,'Enable','off');
+    else
+        set(handles.pushbutton1,'Enable','on');
+    end
 end
 guidata(hObject,handles);
 

@@ -140,7 +140,7 @@ function pushbutton_done_Callback(hObject, eventdata, handles)
 
 userData = get(handles.figure1,'UserData');
     
-[saveName,saveDir] = uiputfile('*.mat','Save your transform:');      
+[saveName,saveDir] = uiputfile('*.mat','Save your transform:','camera_transform');      
 if ~isequal(saveDir,0) && ~isequal(saveName,0)
     save([saveDir saveName],'-struct','userData','xForm');
 end

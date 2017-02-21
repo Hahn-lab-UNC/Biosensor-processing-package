@@ -246,6 +246,8 @@ end
 donor_shade_avg = mean(reshape(donor_shade, n*m, 1));  % average donor intensity
 if transform == 1
     donor_shade = imtransform(donor_shade, trans_matrix,'XData',[1 m],'YData',[1 n],'FillValues',0);
+%     Rout = imref2d(size(donor_shade),[1 m],[1 n]);
+%     donor_shade = imwarp(donor_shade,trans_matrix,'OutputView',Rout,'FillValues',0);
 end
 donor_shade_norm = double(donor_shade) / donor_shade_avg;  % normalized donor shade image
 
@@ -323,7 +325,7 @@ for i = 1:loop
     FRET_sc = uint16(bsxfun(@rdivide, double(FRET), fret_shade_norm));
 
     % Clear Unnecessary Variables
-    if i == 1 && view_fig == 1  
+    if i == 1 
         donor(:,:,2:end) = []; 
         FRET(:,:,2:end) = [];
         if transform == 1
@@ -343,7 +345,7 @@ for i = 1:loop
     end
 
     % Clear Unnecessary Variables
-    if i == 1 && view_fig == 1
+    if i == 1
        donor_sc(:,:,2:end) = [];
        FRET_sc(:,:,2:end) = [];
     else

@@ -30,7 +30,7 @@ if ~isstruct(opt)
 end
 
 num_fields = length(fieldnames(opt));
-if num_fields ~=12
+if num_fields ~=10
     error('Image Processing Cancelled.');
 end
 
@@ -81,8 +81,7 @@ end
 
 %% --- Image splitting and configuration --- %%
 disp('Starting Initial Data Configuration');
-initialize_data(single_vs_dual, dark_current, orientation, align_cameras, split);
-initialize_data_new(single_vs_dual, dark_current, align_cameras);
+initialize_data(single_vs_dual, dark_current, align_cameras);
 
 
 %% --- Region selection & background correction --- %%
