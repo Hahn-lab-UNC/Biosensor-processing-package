@@ -1,4 +1,4 @@
-function initialize_data_new(svd, dark_current, transform)
+function initialize_data(svd, dark_current, transform)
 
 %% Find and Delete Previous Versions of '.tif' Images
 %  In order to write mulitple pages (frames) to a '.tif' requires appending
