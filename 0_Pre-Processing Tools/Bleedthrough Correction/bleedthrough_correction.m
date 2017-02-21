@@ -27,22 +27,26 @@ pause(.2)
 % read in raw images
 for i = 1:q.alpha_pairs*2
     if mod(i,2)
+        disp('Select donor')
         [file,path] = uigetfile('*.tif','Select donor');
         pre_images.a{i} = imread(fullfile(path,file));
         pause(.2)
     else
-        [file,path] = uigetfile('*.tif','Select fret');
+        disp('Select FRET')
+        [file,path] = uigetfile('*.tif','Select FRET');
         pre_images.a{i} = imread(fullfile(path,file));
         pause(.2)
     end
 end
 for i = 1:q.beta_pairs*2
     if mod(i,2)
+        disp('Select acceptor')
         [file,path] = uigetfile('*.tif','Select acceptor');
         pre_images.b{i} = imread(fullfile(path,file));
         pause(.2)
     else
-        [file,path] = uigetfile('*.tif','Select fret');
+        disp('Select FRET')
+        [file,path] = uigetfile('*.tif','Select FRET');
         pre_images.b{i} = imread(fullfile(path,file));
         pause(.2)
     end

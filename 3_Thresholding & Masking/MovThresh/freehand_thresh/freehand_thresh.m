@@ -22,7 +22,7 @@ function varargout = freehand_thresh(varargin)
 
 % Edit the above text to modify the response to help freehand_thresh
 
-% Last Modified by GUIDE v2.5 18-Feb-2017 13:08:04
+% Last Modified by GUIDE v2.5 20-Feb-2017 15:47:41
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -361,6 +361,7 @@ end
 
 % user selection of files and check if file exists
 go = 1;
+disp('Select a ".tif" file to open for drawing mask')
 [file1, path1] = uigetfile('*.tif','Select a ".tif" file to open for drawing mask');
 if file1 == 0
     go = 0;

@@ -297,6 +297,7 @@ if ~isempty(get(handles.axes1,'Children'))
     set(handles.uitoggletool3,'Enable','off');
 end
 
+disp('Select a ".tif" file to open')
 [file, path] = uigetfile('*.tif','Select a ".tif" file to open');
 if file == 0
     return;

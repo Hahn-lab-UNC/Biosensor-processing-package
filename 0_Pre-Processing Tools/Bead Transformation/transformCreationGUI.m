@@ -173,6 +173,7 @@ imageTag = pushbuttonTag(length('pushbutton_select_')+1:end);
 imageName = regexprep(imageTag,'([A-Z])',' ${lower($1)}');
 
 % Launch the file selector and test the user output
+disp(['Select the ' imageName ' file'])
 [filename,filepath] = uigetfile({'*.tif';'*.TIF';'*.tiff';'*.TIFF'},...
                            ['Select the ' imageName ' file:'],userData.defaultPath);
 if isequal(filename,0), return; end
@@ -211,6 +212,7 @@ function pushbutton_select_initXform_Callback(hObject, eventdata, handles)
 
 userData = get(handles.figure1, 'UserData');
 
+disp('Select the initial transformation file')
 [filename,pathname] = uigetfile({'*.mat'},...
                            'Select the initial transformation file:',userData.defaultPath);
 if isequal(filename,0)

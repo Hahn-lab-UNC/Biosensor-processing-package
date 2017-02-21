@@ -352,6 +352,7 @@ try %#ok<TRYNC>
     delete(handles.rect);
 end
 
+disp('Select a ".tif" file to open')
 [file, path] = uigetfile('*.tif','Select a ".tif" file to open');
 if file == 0
     return;

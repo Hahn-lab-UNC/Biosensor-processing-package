@@ -27,10 +27,8 @@ while 1
         break
     else
         disp('No "region_boxes.txt" file found in path...\n');
-        yn = input('Relaunch Background Subtraction GUI to calculate regions? (y/n)');
-        if yn == 'y'
-            continue
-        else
+        yn = input('Relaunch Background Subtraction GUI to calculate regions? (y/n)\n','s');
+        if ~strcmp(yn,'y')
             error('Script needs "region_boxes.txt" to continue processing. Exiting script...');
         end
     end

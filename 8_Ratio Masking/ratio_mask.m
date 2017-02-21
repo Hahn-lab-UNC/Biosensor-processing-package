@@ -539,8 +539,10 @@ end
 
 % user selection of files and check if file exists
 go = 1;
+disp('Select a ".tif" file to open for selecting mask')
 [file1, path1] = uigetfile('*.tif','Select a ".tif" file to open for selecting mask');
 if file1 ~= 0
+    disp('Select a ".tif" file of the ratio image')
     [file2, path2] = uigetfile('*.tif','Select a ".tif" file of the ratio image');
     if file2 == 0
         go = 0;

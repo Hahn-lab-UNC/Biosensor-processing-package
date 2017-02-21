@@ -1,4 +1,4 @@
-Copyright (c) 2016, Paul LaFosse
+Copyright (c) 2017, Paul LaFosse - 2dfretimgproc
 All rights reserved.
 
                     GNU GENERAL PUBLIC LICENSE

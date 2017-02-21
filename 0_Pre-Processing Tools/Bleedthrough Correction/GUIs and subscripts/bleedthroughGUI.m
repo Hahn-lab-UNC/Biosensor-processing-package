@@ -170,11 +170,13 @@ guidata(hObject,handles);
 
 
 function pushbutton1_Callback(hObject, ~, handles)
+disp('Select the shade image for the donor emission channel to use')
 [file_shade_donor, path_shade_donor] = uigetfile('*.tif','Select the shade image for the donor emission channel to use');
 if file_shade_donor == 0
     return;
 end
-[file_shade_fret, path_shade_fret] = uigetfile('*.tif','Select the shade image for the fret emission channel to use');
+disp('Select the shade image for the FRET emission channel to use')
+[file_shade_fret, path_shade_fret] = uigetfile('*.tif','Select the shade image for the FRET emission channel to use');
 if file_shade_fret == 0
     return;
 end
@@ -189,11 +191,13 @@ if ~isempty(handles.btopts.dark_donor) || handles.btopts.alpha_dark == 0
 end
 guidata(hObject,handles);
 function pushbutton2_Callback(hObject, ~, handles)
-[file_dark_donor, path_dark_donor] = uigetfile('*.tif','Select the shade image for the donor emission channel to use');
+disp('Select the dark current image for the donor emission channel to use')
+[file_dark_donor, path_dark_donor] = uigetfile('*.tif','Select the dark current image for the donor emission channel to use');
 if file_dark_donor == 0
     return;
 end
-[file_dark_acceptor, path_dark_acceptor] = uigetfile('*.tif','Select the shade image for the fret emission channel to use');
+disp('Select the dark current image for the FRET emission channel to use')
+[file_dark_acceptor, path_dark_acceptor] = uigetfile('*.tif','Select the dark current image for the FRET emission channel to use');
 if file_dark_acceptor == 0
     return;
 end
@@ -285,11 +289,13 @@ guidata(hObject,handles);
 
 
 function pushbutton3_Callback(hObject, ~, handles)
+disp('Select the shade image for the acceptor emission channel to use')
 [file_shade_acceptor, path_shade_acceptor] = uigetfile('*.tif','Select the shade image for the acceptor emission channel to use');
 if file_shade_acceptor == 0
     return;
 end
-[file_shade_fret, path_shade_fret] = uigetfile('*.tif','Select the shade image for the fret emission channel to use');
+disp('Select the shade image for the FRET emission channel to use')
+[file_shade_fret, path_shade_fret] = uigetfile('*.tif','Select the shade image for the FRET emission channel to use');
 if file_shade_fret == 0
     return;
 end
@@ -304,7 +310,8 @@ if ~isempty(handles.btopts.dark_acceptor) || handles.btopts.beta_dark == 0
 end
 guidata(hObject,handles);
 function pushbutton4_Callback(hObject, ~, handles)
-[file_dark_acceptor, path_dark_acceptor] = uigetfile('*.tif','Select the shade image for the acceptor emission channel to use');
+disp('Select the dark current image for the acceptor emission channel to use')
+[file_dark_acceptor, path_dark_acceptor] = uigetfile('*.tif','Select the dark current image for the acceptor emission channel to use');
 if file_dark_acceptor == 0
     return;
 end

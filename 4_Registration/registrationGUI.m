@@ -606,10 +606,12 @@ if ~isempty(get(handles.axes1,'Children'))
 end
     
 % import base (b) and register (r) image
+disp('Select the base image to register to (".tif" format)')
 [file1, path1] = uigetfile('*.tif','Select the base image to register to (".tif" format):');
 if file1 == 0
     return;
 end
+disp('Select the image to register to the base image (".tif" format)')
 [file2, path2] = uigetfile('*.tif','Select the image to register to the base image (".tif" format):');
 if file2 == 0
     return;

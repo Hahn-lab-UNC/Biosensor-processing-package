@@ -529,9 +529,8 @@ function import(hObject,boost)
 %         handles.lisdraw2.Enabled = 0;
 %         handles.lisdraw5.Enabled = 0;
         
-
-        [filename,pathname,filterindex] = uigetfile('*.tif'); 
-
+        disp('Select a ".tif" file to open for drawing mask')
+        [filename,pathname,filterindex] = uigetfile('*.tif','Select a ".tif" file to open for applying mask'); 
         if filename~=0
             
             handles.ON_CURRENT_FRAME = 0;

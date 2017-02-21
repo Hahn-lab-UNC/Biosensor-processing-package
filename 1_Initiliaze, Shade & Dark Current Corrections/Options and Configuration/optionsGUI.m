@@ -22,7 +22,7 @@ function varargout = optionsGUI(varargin)
 
 % Edit the above text to modify the response to help optionsGUI
 
-% Last Modified by GUIDE v2.5 18-Feb-2017 13:00:33
+% Last Modified by GUIDE v2.5 21-Feb-2017 12:17:49
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -57,12 +57,10 @@ handles.opts.one_mask = 0;
 handles.opts.dark = 0;
 handles.opts.photobleach = 0;
 handles.opts.align_cams = 0;
-handles.opts.split = 0;
 handles.opts.filter = 0;
 
 handles.opts.reg_option = 1;
 handles.opts.svd = 1;
-handles.opts.orientation = 1;
 
 handles.opts.alpha = 0.00;
 handles.opts.beta = 0.00;
@@ -125,39 +123,11 @@ handles.opts.align_cams = state;
 guidata(hObject,handles);
 function checkbox9_Callback(hObject, ~, handles)
 state = get(hObject,'Value');
-handles.opts.split = state;
-if state == 1
-    set(handles.pushbutton1,'Visible','on');
-    set(handles.text12,'Visible','on');
-    set(handles.uipanel5,'Visible','on');
-else
-    set(handles.pushbutton1,'Visible','off');
-    set(handles.text12,'Visible','off');
-    set(handles.uipanel5,'Visible','off');
-end
-guidata(hObject,handles);
-function checkbox10_Callback(hObject, ~, handles)
-state = get(hObject,'Value');
 handles.opts.filter = state;
 guidata(hObject,handles);
 
 
 %% Push Buttons
-function pushbutton1_Callback(hObject, ~, handles)
-if handles.opts.orientation == 1 
-    handles.opts.orientation = 2;
-    set(handles.text14,'String','Donor');
-    set(handles.text15,'String','FRET');
-    set(handles.text16,'String','----------');
-    set(handles.text17,'String','Acceptor');
-else
-    handles.opts.orientation = 1;
-    set(handles.text14,'String','FRET');
-    set(handles.text15,'String','Donor');
-    set(handles.text16,'String','Acceptor');
-    set(handles.text17,'String','----------');  
-end
-guidata(hObject,handles);
 function pushbutton2_Callback(hObject, ~, handles)
 handles.output = handles.opts;
 opts = {handles.opts}; %#ok<NASGU>
