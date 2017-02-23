@@ -30,7 +30,7 @@ if ~isstruct(opt)
 end
 
 num_fields = length(fieldnames(opt));
-if num_fields ~=10
+if num_fields ~= 10
     error('Image Processing Cancelled.');
 end
 

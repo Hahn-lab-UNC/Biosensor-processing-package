@@ -92,6 +92,12 @@ handles.lisdraw6=addlistener(handles.drawerSlider, 'Value', 'PostSet', @(src, ev
 handles.lisdraw2=addlistener(handles.drawerSlider, 'Value', 'PostSet', @(src, event)readjustFrame(hObject, src, event));
 handles.lisdraw7=addlistener(handles.drawerSlider, 'Value', 'PostSet', @(src, event)currentSliderVal(hObject, src, event));
 
+% handles.lismove1=event.listener(handles.movieSlider, 'PostSet', @(src, event)switchImage(hObject, src, event));
+% hlismove2=event.listener(handles.movieSlider, 'PostSet', @(src, event)replot(hObject, src, event));
+% handles.lisdraw1=event.listener(handles.drawerSlider, 'PostSet', @(src, event)redrawMean(hObject, src, event));
+% hlisdraw5=event.listener(handles.drawerSlider, 'PostSet', @(src, event)translateSmooth(hObject, src, event));
+% hlisdraw2=event.listener(handles.drawerSlider, 'PostSet', @(src, event)readjustFrame(hObject, src, event));
+
 % Update handles structure
 colormap(handles.imageLoc,'gray');
 set(handles.imageLoc,'Box','on','XTick',[],'YTick',[]);
@@ -413,7 +419,7 @@ function readjustFrame(hObject, src, event)
     guidata(hObject, handles);
   
 function currentSliderVal(hObject, src, event)
-handles = guidata(hObject);
+handles = guidata(hObejct);
 str = sprintf('Slider Value = %.2f',get(handles.drawerSlider,'Value'));
 set(handles.sliderVal,'String',str);
 guidata(hObject,handles);

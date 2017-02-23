@@ -198,6 +198,7 @@ function edit1_Callback(hObject, ~, handles)
 set(hObject,'String',handles.selected_path);
 guidata(hObject,handles);
 function edit2_Callback(hObject, ~, handles)
+set(handles.listbox1,'Value',1);
 handles.query = get(hObject,'String');
 if ~(handles.working_dir==0)
     if ~isempty(handles.query)

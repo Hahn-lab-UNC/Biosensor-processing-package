@@ -134,7 +134,7 @@ for i = 1:loop
 
     % Write the Shade Corrected, Background Subtracted donor and FRET
     % images to '.tif' files
-    for j = 1:length(ind);
+    for j = 1:length(ind)
         try 
             imwrite(donor_scbg(:,:,j), 'donor_scbg.tif',  'Compression', 'none', 'WriteMode', 'append');  % shade corrected, background subtracted donor images
         catch
@@ -177,7 +177,7 @@ for i = 1:loop
 
         % Write the Shade Corrected, Background Subtracted acceptor
         % images to '.tif' files
-        for j = 1:length(ind);
+        for j = 1:length(ind)
             imwrite(acceptor_scbg(:,:,j), 'acceptor_scbg.tif',  'Compression', 'none', 'WriteMode', 'append');  % shade corrected, background subtracted acceptor images      
         end 
     end
@@ -196,7 +196,7 @@ for i = 1:loop
 
     % Write the Cropped, Shade Corrected, Background Subtracted donor
     % and FRET images to '.tif' files
-    for j = 1:length(ind);
+    for j = 1:length(ind)
         try 
             imwrite(donor_scbg_roi(:,:,j), 'donor_scbg_roi.tif',  'Compression', 'none', 'WriteMode', 'append')
         catch
@@ -235,7 +235,7 @@ for i = 1:loop
 
         % Write the Cropped, Shade Corrected, Background Subtracted
         % acceptor images to '.tif' files
-        for j = 1:length(ind);
+        for j = 1:length(ind)
             imwrite(acceptor_scbg_roi(:,:,j), 'acceptor_scbg_roi.tif',  'Compression', 'none', 'WriteMode', 'append')
         end
 

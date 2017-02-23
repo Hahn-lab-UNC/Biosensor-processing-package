@@ -376,7 +376,7 @@ if filter
             imwrite(im_pbc,file_name,'tif','Compression','none','WriteMode','append');
         catch
             pause(1)
-            fprintf('PHOTOBLEACH Iteration value: %i\n', j);
+%             fprintf('PHOTOBLEACH Iteration value: %i\n', i);
             imwrite(im_pbc,file_name,'tif','Compression','none','WriteMode','append');
         end
     end
