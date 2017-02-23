@@ -54,7 +54,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % --- Outputs from this function are returned to the command line.
-function varargout = photobleachGUI_OutputFcn(~, ~, handles) 
+function varargout = photobleachGUI_OutputFcn(~, ~, handles)
 varargout{1} = handles.output;
 
 
@@ -322,9 +322,23 @@ guidata(hObject,handles);
 
 % get array of normalized average intensities of time frames
 if handles.numframe < 4
-    msgbox('Photobleach correction requires the image series to have at least 4 time frames.'...
-        , 'Error','error');
-    return;
+    choice = questdlg('Photobleach correction requires the image series to have at least 4 time frames. Would you like to continue processing without photobleach correction?', ...
+            'Insufficient Number of Frames', ...
+            'Skip Photobleach Correction','Select New Image','Select New Image');
+    switch choice
+        case 'Skip Photobleach Correction'
+            if exist('run_opts.mat','file') == 2
+                load('run_opts.mat');
+                opts{1,1}.photobleach = 0;
+                save('run_opts.mat');
+                clear opts
+            end
+            delete(handles.figure1)
+            disp('Photobleach Correction skipped')
+            return
+        case 'Select New Image'
+            return
+    end        
 else
     handles.norms = norm_avg_intensities(hObject);
 end

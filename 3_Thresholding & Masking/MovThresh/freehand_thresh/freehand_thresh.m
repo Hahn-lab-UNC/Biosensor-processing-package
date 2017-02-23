@@ -274,7 +274,9 @@ if strcmp(task,'Create New Mask')
 end
 
 % enable all options for user - drawing finished
-set(handles.slider3,'Enable','On');
+if handles.num_frames > 1
+    set(handles.slider3,'Enable','On');
+end
 set(handles.edit3,'Enable','On');
 set(handles.pushbutton1,'Enable','On');
 set(handles.pushbutton2,'Enable','Off');
@@ -369,7 +371,9 @@ end
 if go == 0 && ~isempty(get(handles.axes1,'Children'))
     set(handles.slider1,'Enable','On');
     set(handles.slider2,'Enable','On');
-    set(handles.slider3,'Enable','On');
+    if handles.num_frames > 1
+        set(handles.slider3,'Enable','On');
+    end
     set(handles.edit1,'Enable','On');
     set(handles.edit2,'Enable','On');
     set(handles.edit3,'Enable','On');
@@ -392,33 +396,62 @@ handles.width1 = info1(1).Width;
 handles.height1 = info1(1).Height;
 total_frames = length(info1);
 
-input_str = '1:2:5 8 9';
-while 1
-    prompt = sprintf(['Select Time Frames to Draw Masks For:\n\n',...
+input_str = '';
+prompt = sprintf(['Select Time Frames to Draw Masks For:\n\n',...
                       'The selected image has %d time frames\n',...
                       'Enter space-separated numbers indicating specific time frames below (eg: 1 3 5)\n',...
                       '*For a range of numbers, use x:y\n',...
                       '*For a sparsed range of numbers, use x:i:y, where i is the increment value\n\n',...
                       'If you want to draw a mask for every time frame in the file\n'...
                       'leave the text field below empty\n'],total_frames);
+while 1
     input_str = inputdlg(prompt,'',1,{input_str});
-    input_vector = sort(str2num(input_str{:})); %#ok<ST2NM>
-    if isempty(input_vector)
-        num_frames = total_frames;
-        break
-    elseif length(input_vector) > total_frames
-        msgbox('Length of input exceeds number of frames in image');
-    elseif input_vector(length(input_vector)) > total_frames || input_vector(1) < 1
-        msg = sprintf('Some input number(s) are outside the range of frames in the image: (1,%d)',total_frames);
-        msgbox(msg);
-    elseif length(unique(input_vector)) < length(input_vector)
-        msgbox('Some input number(s) are repeated');
+    if isempty(input_str) && ~isempty(get(handles.axes1,'Children'))
+        set(handles.slider1,'Enable','On');
+        set(handles.slider2,'Enable','On');
+        if handles.num_frames > 1
+            set(handles.slider3,'Enable','On');
+        end
+        set(handles.edit1,'Enable','On');
+        set(handles.edit2,'Enable','On');
+        set(handles.edit3,'Enable','On');
+        set(handles.edit4,'Enable','On');
+        set(handles.pushbutton1,'Enable','On');
+        set(handles.popupmenu1,'Enable','On');
+        set(handles.listbox1,'Enable','On');
+        set(handles.uitoggletool1,'Enable','On');
+        set(handles.uitoggletool2,'Enable','On');
+        set(handles.uitoggletool3,'Enable','On');
+        set(handles.playtoggle1,'Enable','On');
+        return;
+    elseif isempty(input_str) && isempty(get(handles.axes1,'Children'))
+        return
     else
-        num_frames = length(input_vector);
-        break
+        if isempty(input_str{1})
+            h = msgbox('Please enter at least one frame index');
+            waitfor(h)
+            input_str = '';
+        else
+            input_vector = sort(str2num(input_str{:})); %#ok<ST2NM>
+            if length(input_vector) > total_frames
+                h = msgbox('Length of input exceeds number of frames in image');
+                waitfor(h)
+            elseif input_vector(length(input_vector)) > total_frames || input_vector(1) < 1
+                msg = sprintf('Some input number(s) are outside the range of frames in the image: (1,%d)',total_frames);
+                h = msgbox(msg);
+                waitfor(h)
+            elseif length(unique(input_vector)) < length(input_vector)
+                h = msgbox('Some input number(s) are repeated');
+                waitfor(h)
+            else
+                num_frames = length(input_vector);
+                break
+            end
+        end
     end
 end
 
+handles.num_frames = num_frames;
 handles.frames_of_interest = input_vector;
 handles.frame_list = cell(1,num_frames);
 handles.frameidx_list = 1:num_frames;
@@ -490,7 +523,9 @@ handles.cur1 = handles.frames1{1};
 % enable all options for user - import finished
 set(handles.slider1,'Enable','On');
 set(handles.slider2,'Enable','On');
-set(handles.slider3,'Enable','On');
+if num_frames > 1
+    set(handles.slider3,'Enable','On');
+end
 set(handles.edit1,'Enable','On');
 set(handles.edit2,'Enable','On');
 set(handles.edit3,'Enable','On');
@@ -558,7 +593,9 @@ msgbox('Masks saved. Close GUI window to continue.');
 % enable all options for user - save finished
 set(handles.slider1,'Enable','On');
 set(handles.slider2,'Enable','On');
-set(handles.slider3,'Enable','On');
+if handles.num_frames > 1
+    set(handles.slider3,'Enable','On');
+end
 set(handles.edit1,'Enable','On');
 set(handles.edit2,'Enable','On');
 set(handles.edit3,'Enable','On');

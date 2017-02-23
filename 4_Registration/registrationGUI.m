@@ -622,6 +622,7 @@ info_b = imfinfo(fullfile(path1,file1));
 handles.width_b = info_b(1).Width;
 handles.height_b = info_b(1).Height;
 num_frames_b = length(info_b);
+handles.num_frames = num_frames_b;
 
 info_r = imfinfo(fullfile(path2,file2));
 handles.width_r = info_r(1).Width;
@@ -668,7 +669,9 @@ set(handles.slider1,'Enable','On');
 set(handles.slider2,'Enable','On');
 set(handles.slider3,'Enable','On');
 set(handles.slider4,'Enable','On');
-set(handles.slider7,'Enable','On');
+if handles.num_frames_b > 1
+    set(handles.slider1,'Enable','On');
+end
 set(handles.radiobutton1,'Enable','On');
 set(handles.radiobutton2,'Enable','On');
 set(handles.edit1,'Enable','On');
@@ -823,7 +826,9 @@ set(handles.slider1,'Enable','On');
 set(handles.slider2,'Enable','On');
 set(handles.slider3,'Enable','On');
 set(handles.slider4,'Enable','On');
-set(handles.slider7,'Enable','On');
+if handles.num_frames_b > 1
+    set(handles.slider1,'Enable','On');
+end
 set(handles.radiobutton1,'Enable','On');
 set(handles.radiobutton2,'Enable','On');
 set(handles.edit1,'Enable','On');

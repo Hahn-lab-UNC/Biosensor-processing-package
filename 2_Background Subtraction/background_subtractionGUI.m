@@ -100,7 +100,7 @@ else
     imHandle = findobj(handles.axes1,'Type','image');
     set(imHandle,'CData',handles.curImage); % update the image to the current frame
     
-    if handles.zoombox == 1;
+    if handles.zoombox == 1
         update_region(handles.position, hObject, handles)
     end
 end
@@ -363,6 +363,7 @@ info = imfinfo(fullfile(path,file));
 handles.width = info(1).Width;
 handles.height = info(1).Height;
 num_frames = length(info);
+handles.num_frames = num_frames;
 
 % set initial region of interest and background region
 set(handles.text12,'String',sprintf('[1 1 %d %d]',...
@@ -383,7 +384,9 @@ handles.CLim_Max = max(max(maxs));  % define the maximum value
 handles.CLim_Min = 0;               % define the minimum value
 
 % turn enable 'On' for all necessary components
-set(handles.slider1,'Enable','On');
+if num_frames > 1
+    set(handles.slider1,'Enable','On');
+end
 set(handles.slider2,'Enable','On');
 set(handles.slider3,'Enable','On');
 set(handles.edit1,'Enable','On');
@@ -490,7 +493,9 @@ if filter
     cd(old_dir);
 end
 
-set(handles.slider1,'Enable','On');
+if handles.num_frames > 1
+    set(handles.slider1,'Enable','On');
+end
 set(handles.slider2,'Enable','On');
 set(handles.slider3,'Enable','On');
 set(handles.edit1,'Enable','On');

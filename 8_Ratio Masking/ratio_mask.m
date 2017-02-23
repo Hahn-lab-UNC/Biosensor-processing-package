@@ -404,7 +404,9 @@ set(handles.slider1,'Enable','On');
 set(handles.slider2,'Enable','On');
 set(handles.slider3,'Enable','On');
 set(handles.slider4,'Enable','On');
-set(handles.slider5,'Enable','On');
+if handles.num_frames > 1
+    set(handles.slider5,'Enable','On');
+end
 set(handles.slider6,'Enable','On');
 set(handles.edit1,'Enable','On');
 set(handles.edit2,'Enable','On');
@@ -555,7 +557,9 @@ if go == 0 && ~isempty(get(handles.axes1,'Children'))
     set(handles.slider2,'Enable','On');
     set(handles.slider3,'Enable','On');
     set(handles.slider4,'Enable','On');
-    set(handles.slider5,'Enable','On');
+    if handles.num_frames > 1
+        set(handles.slider5,'Enable','On');
+    end
     set(handles.slider6,'Enable','On');
     set(handles.edit1,'Enable','On');
     set(handles.edit2,'Enable','On');
@@ -583,6 +587,7 @@ info1 = imfinfo(fullfile(path1,file1));
 handles.width1 = info1(1).Width;
 handles.height1 = info1(1).Height;
 num_frames1 = length(info1);
+handles.num_frames = num_frames1;
 
 info2 = imfinfo(fullfile(path2,file2));
 handles.width2 = info2(1).Width;
@@ -728,7 +733,9 @@ set(handles.slider1,'Enable','On');
 set(handles.slider2,'Enable','On');
 set(handles.slider3,'Enable','On');
 set(handles.slider4,'Enable','On');
-set(handles.slider5,'Enable','On');
+if num_frames1 > 1
+    set(handles.slider5,'Enable','On');
+end
 set(handles.slider6,'Enable','On');
 set(handles.edit1,'Enable','On');
 set(handles.edit2,'Enable','On');
@@ -806,7 +813,9 @@ set(handles.slider1,'Enable','On');
 set(handles.slider2,'Enable','On');
 set(handles.slider3,'Enable','On');
 set(handles.slider4,'Enable','On');
-set(handles.slider5,'Enable','On');
+if handles.num_frames > 1
+    set(handles.slider5,'Enable','On');
+end
 set(handles.slider6,'Enable','On');
 set(handles.edit1,'Enable','On');
 set(handles.edit2,'Enable','On');

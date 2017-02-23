@@ -350,7 +350,9 @@ guidata(hObject,handles);
 update_images(hObject,frame)
 
 set(hObject,'Enable','On');
-set(handles.slider1,'Enable','On');
+if handles.num_frames > 1
+    set(handles.slider1,'Enable','On');
+end
 set(handles.slider2,'Enable','On');
 set(handles.slider3,'Enable','On');
 set(handles.edit3,'Enable','On');
@@ -456,7 +458,9 @@ if file == 0
     go = 0;
 end
 if go == 0 && ~isempty(get(handles.axes1,'Children'))
-    set(handles.slider1,'Enable','On');
+    if handles.num_frames > 1
+        set(handles.slider1,'Enable','On');
+    end
     set(handles.slider2,'Enable','On');
     set(handles.slider3,'Enable','On');
     set(handles.edit3,'Enable','On');
@@ -479,6 +483,7 @@ info = imfinfo(fullfile(path,file));
 handles.width = info(1).Width;
 handles.height = info(1).Height;
 num_frames = length(info);
+handles.num_frames = num_frames;
 
 % initialize image data and load into handles.frames
 handles.frames_unfil = cell(1,num_frames);
@@ -495,7 +500,9 @@ handles.CLim_Max = max(max(maxs));  % define the maximum value
 handles.CLim_Min = 0;               % define the minimum value
 
 % turn enable 'On' for all necessary components
-set(handles.slider1,'Enable','On');
+if num_frames > 1
+    set(handles.slider1,'Enable','On');
+end
 set(handles.slider2,'Enable','On');
 set(handles.slider3,'Enable','On');
 set(handles.edit3,'Enable','On');
@@ -610,7 +617,9 @@ if filter
     cd(old_dir);
 end
 
-set(handles.slider1,'Enable','On');
+if handles.num_frames > 1
+    set(handles.slider1,'Enable','On');
+end
 set(handles.slider2,'Enable','On');
 set(handles.slider3,'Enable','On');
 set(handles.edit3,'Enable','On');

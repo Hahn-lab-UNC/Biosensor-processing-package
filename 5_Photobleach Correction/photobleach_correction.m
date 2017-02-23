@@ -18,6 +18,14 @@ else
     end
     donor_info = imfinfo(fullfile(donor_path, donor_file));
     frames = numel(donor_info);
+    if frames < 4
+        disp('Photobleach correction requires the image series to have at least 4 time frames.')
+        load('run_opts.mat');
+        opts{1,1}.photobleach = 0;
+        save('run_opts.mat');
+        clear opts
+        return
+    end
 
     fret_path = cd;
     fret_file = 'fret_masked.tif';
