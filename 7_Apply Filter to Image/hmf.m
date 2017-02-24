@@ -52,7 +52,7 @@ function A = hmf(A,n)
 %
 %   -- Damien Garcia -- 2007/08, revised 2010/02 
 
-error(nargchk(1,2,nargin));
+narginchk(1,2);
 if nargin==1, n = 5; end
 
 if ~isscalar(n) || n<0, n = 5; end
@@ -80,7 +80,7 @@ if isRGB
 end
 % ---- end of isrgb ----
 
-assert(isRGB | ndims(A)==2,...
+assert(isRGB | ismatrix(A),...
     'The input must be a 2-D array or an RGB image.')
 
 classA = class(A);

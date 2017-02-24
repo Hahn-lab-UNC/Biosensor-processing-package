@@ -22,7 +22,7 @@ function varargout = filterGUI(varargin)
 
 % Edit the above text to modify the response to help filterGUI
 
-% Last Modified by GUIDE v2.5 10-Aug-2016 16:03:38
+% Last Modified by GUIDE v2.5 24-Feb-2017 13:32:39
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -272,13 +272,10 @@ else
 end
 function popupmenu2_Callback(hObject, ~, handles)
 val = get(hObject,'Value');
-set(handles.save_tag,'Enable','Off');
 if val == 1
     set(handles.edit4,'Enable','Off');
     set(handles.edit5,'Enable','Off');
     set(handles.pushbutton1,'Enable','Off');
-    cla(handles.axes2);
-    set(handles.axes2,'XTick',[],'YTick',[],'Box','on');  % set 'handles.axes2' properties
 elseif val == 5
     set(handles.edit4,'Enable','Off');
     set(handles.edit5,'Enable','On');
@@ -325,27 +322,32 @@ switch filt
             handles.frames_fil{i} = hmf(handles.frames_unfil{i}, str2double(get(handles.edit4,'String')));
         end
         set(handles.edit4,'Enable','On');
+        set(handles.text3,'String','Filtered Image - Hybrid Median');
     case 3 % median filter
         for i = 1:frames
             handles.frames_fil{i}= medfilt2(handles.frames_unfil{i}, [str2double(get(handles.edit4,'String')) str2double(get(handles.edit4,'String'))]);
         end
         set(handles.edit4,'Enable','On');
+        set(handles.text3,'String','Filtered Image - Median');
     case 4 % mean filter
         for i = 1:frames
             handles.frames_fil{i}= imboxfilt(handles.frames_unfil{i}, str2double(get(handles.edit4,'String')));
         end
         set(handles.edit4,'Enable','On');
+        set(handles.text3,'String','Filtered Image - Mean');
     case 5 % gaussian smoothing
         for i = 1:frames
             handles.frames_fil{i} = imgaussfilt(handles.frames_unfil{i}, str2double(get(handles.edit5,'String')));
         end
         set(handles.edit5,'Enable','On');
+        set(handles.text3,'String','Filtered Image - Gaussian Smoothing');
     otherwise % reset
         for i = 1:frames
             handles.frames_fil{i} = zeros(handles.height,handles.width);
         end
 end
 
+handles.filter = filt;
 guidata(hObject,handles);
 update_images(hObject,frame)
 
@@ -469,6 +471,9 @@ if go == 0 && ~isempty(get(handles.axes1,'Children'))
     set(handles.popupmenu2,'Enable','On');
     set(handles.CLim_Max_Tag,'Enable','On');
     set(handles.CLim_Min_Tag,'Enable','On');
+    if handles.filter ~= 0
+        set(handles.save_tag,'Enable','On');
+    end
     set(handles.uitoggletool1,'Enable','On');
     set(handles.uitoggletool2,'Enable','On');
     set(handles.uitoggletool3,'Enable','On');
@@ -535,6 +540,7 @@ update_images(hObject,round(get(handles.slider1,'Value')));
 contents = cellstr(get(handles.popupmenu1,'String'));
 cm = contents{get(handles.popupmenu1,'Value')};
 colormap(cm);
+handles.filter = 0;
 
 % set initial max and min pixel values
 set(handles.CLim_Max_Tag, 'String', num2str(handles.CLim_Max));
@@ -549,7 +555,7 @@ handles.sl2 = addlistener(handles.slider2,'Value','PostSet',@(src,evnt)slider2(h
 handles.sl3 = addlistener(handles.slider3,'Value','PostSet',@(src,evnt)slider3(handles.figure1,src,evnt));
 
 % set mouse hover functionality
-set(handles.figure1,'WindowButtonMotionFcn',@(varargin) mousehover(handles.figure1,varargin));
+set(handles.figure1,'WindowButtonMotionFcn',@(varargin)mousehover(handles.figure1,varargin));
 
 handles.cur_unfil = handles.frames_unfil{1};
 handles.cur_fil = handles.frames_fil{1};
@@ -572,7 +578,7 @@ set(handles.uitoggletool2,'Enable','Off');
 set(handles.uitoggletool3,'Enable','Off');
 set(handles.playtoggle1,'Enable','Off');
 
-filt = get(handles.popupmenu2,'Value');
+filt = handles.filter;
 switch filt
     case 2 % hybrid median filter
         filter_name = 'hmf';

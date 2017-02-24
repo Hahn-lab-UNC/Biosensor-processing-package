@@ -669,7 +669,7 @@ set(handles.slider1,'Enable','On');
 set(handles.slider2,'Enable','On');
 set(handles.slider3,'Enable','On');
 set(handles.slider4,'Enable','On');
-if handles.num_frames_b > 1
+if num_frames_b > 1
     set(handles.slider1,'Enable','On');
 end
 set(handles.radiobutton1,'Enable','On');
@@ -826,7 +826,7 @@ set(handles.slider1,'Enable','On');
 set(handles.slider2,'Enable','On');
 set(handles.slider3,'Enable','On');
 set(handles.slider4,'Enable','On');
-if handles.num_frames_b > 1
+if handles.num_frames > 1
     set(handles.slider1,'Enable','On');
 end
 set(handles.radiobutton1,'Enable','On');

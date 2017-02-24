@@ -146,7 +146,7 @@ for x=1:frames
         ratio_mat_fd(isnan(ratio_mat_fd)) = 0;
         ratio_cell_fd{x} = ratio_mat_fd;
 
-%         ratio_fd = ratio_fd*1000;
+        ratio_fd = ratio_fd*1000;
         ratio_fd(ratio_fd==Inf) = 0;
         ratio_int_fd = uint16(ratio_fd);
 
@@ -169,7 +169,7 @@ for x=1:frames
         ratio_mat_df(isnan(ratio_mat_df)) = 0;
         ratio_cell_df{x} = ratio_mat_df;
 
-%         ratio_df = ratio_df*1000;
+        ratio_df = ratio_df*1000;
         ratio_df(ratio_df==Inf) = 0;
         ratio_int_df = uint16(ratio_df);
         
@@ -193,7 +193,7 @@ for x=1:frames
             ratio_mat_fa(isnan(ratio_mat_fa)) = 0;
             ratio_cell_fa{x} = ratio_mat_fa;
 
-%             ratio_fa = ratio_fa*1000;
+            ratio_fa = ratio_fa*1000;
             ratio_fa(ratio_fa==Inf) = 0;
             ratio_int_fa = uint16(ratio_fa);
 
@@ -216,7 +216,7 @@ for x=1:frames
             ratio_mat_af(isnan(ratio_mat_af)) = 0;
             ratio_cell_af{x} = ratio_mat_af;
 
-%             ratio_af = ratio_af*1000;
+            ratio_af = ratio_af*1000;
             ratio_af(ratio_af==Inf) = 0;
             ratio_int_af = uint16(ratio_af);
 
@@ -233,6 +233,7 @@ for x=1:frames
     end
 end
 
+disp('Ratio Images are saved with values multiplied by 1000 so as to sign integer values to a 16 bit image while still containing decimal place information. The corresponding ratio values are stored in the respective ".mat" files inside the working directory.');
 if ratio_type(1) == 1
     save('ratio_fret_donor.mat','ratio_cell_fd');
 end
