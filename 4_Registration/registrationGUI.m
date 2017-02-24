@@ -606,15 +606,46 @@ if ~isempty(get(handles.axes1,'Children'))
 end
     
 % import base (b) and register (r) image
+% user selection of files and check if file exists
+go = 1;
 disp('Select the base image to register to (".tif" format)')
 [file1, path1] = uigetfile('*.tif','Select the base image to register to (".tif" format):');
-if file1 == 0
-    return;
+if file1 ~= 0
+    disp('Select the image to register to the base image (".tif" format)')
+    [file2, path2] = uigetfile('*.tif','Select the image to register to the base image (".tif" format):');
+    if file2 == 0
+        go = 0;
+    end
+else
+    go = 0;
 end
-disp('Select the image to register to the base image (".tif" format)')
-[file2, path2] = uigetfile('*.tif','Select the image to register to the base image (".tif" format):');
-if file2 == 0
+if go == 0 && ~isempty(get(handles.axes1,'Children'))
+    set(handles.slider1,'Enable','On');
+    set(handles.slider2,'Enable','On');
+    set(handles.slider3,'Enable','On');
+    set(handles.slider4,'Enable','On');
+    if handles.num_frames > 1
+        set(handles.slider1,'Enable','On');
+    end
+    set(handles.radiobutton1,'Enable','On');
+    set(handles.radiobutton2,'Enable','On');
+    set(handles.edit1,'Enable','On');
+    set(handles.edit2,'Enable','On');
+    set(handles.edit3,'Enable','On');
+    set(handles.edit8,'Enable','On');
+    set(handles.popupmenu1,'Enable','On');
+    set(handles.CLim_Max_Tag1,'Enable','On');
+    set(handles.CLim_Min_Tag1,'Enable','On');
+    set(handles.CLim_Max_Tag2,'Enable','On');
+    set(handles.CLim_Min_Tag2,'Enable','On');
+    set(handles.save_tag,'Enable','On');
+    set(handles.uitoggletool1,'Enable','On');
+    set(handles.uitoggletool2,'Enable','On');
+    set(handles.uitoggletool3,'Enable','On');
+    set(handles.playtoggle1,'Enable','On');
     return;
+elseif go == 0 && isempty(get(handles.axes1,'Children'))
+    return
 end
 
 % get image information
