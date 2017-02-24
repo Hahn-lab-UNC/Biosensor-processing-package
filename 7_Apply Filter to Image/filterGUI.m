@@ -22,7 +22,7 @@ function varargout = filterGUI(varargin)
 
 % Edit the above text to modify the response to help filterGUI
 
-% Last Modified by GUIDE v2.5 24-Feb-2017 13:53:25
+% Last Modified by GUIDE v2.5 24-Feb-2017 13:53:05
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;

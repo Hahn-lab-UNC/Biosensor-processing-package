@@ -30,7 +30,7 @@ if ~isstruct(opt)
 end
 
 num_fields = length(fieldnames(opt));
-if num_fields ~= 10
+if num_fields ~= 11
     error('Image Processing Cancelled.');
 end
 
@@ -52,6 +52,7 @@ one_mask          = opt.one_mask;
 ratio_type        = opt.ratios;
 % use transformation matrix to align images from two cameras
 align_cameras     = opt.align_cams;
+xform_mat         = opt.xform_mat;
 % bleedthrough coefficients for dual chain biosensor processing
 alpha             = opt.alpha;
 beta              = opt.beta;
@@ -69,19 +70,9 @@ cd(working_dir);
 addpath(genpath(working_dir));
 
 
-%% --- Transformation matrix configuration --- %%
-if align_cameras == 1
-     if exist('camera_transform.mat','file') ~= 2
-         disp('Starting Camera Transformation-Matrix Creation GUI...');
-         handle = transformCreationGUI;
-         waitfor(handle);
-     end
-end
-
-
 %% --- Image splitting and configuration --- %%
 disp('Starting Initial Data Configuration');
-initialize_data(single_vs_dual, dark_current, align_cameras);
+initialize_data(single_vs_dual, dark_current, align_cameras, xform_mat);
 
 
 %% --- Region selection & background correction --- %%
@@ -131,5 +122,5 @@ end
 
 
 %% --- End --- %%
-input('Enter anything to close all windows and finish','s');
+input('Press "Enter" to close all windows and finish','s');
 close all;

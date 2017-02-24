@@ -1,4 +1,4 @@
-function initialize_data(svd, dark_current, transform)
+function initialize_data(svd, dark_current, transform, xform_mat)
 
 %% Find and Delete Previous Versions of '.tif' Images
 %  In order to write mulitple pages (frames) to a '.tif' requires appending
@@ -30,6 +30,8 @@ try
 end
 
 %%
+%#ok<*NASGU>
+%#ok<*DIMTRNS>
 %% - Select Data to Import
 if exist('img_data.mat','file') == 2
     % Construct a questdlg with three options
@@ -87,7 +89,6 @@ if exist('img_data.mat','file') == 2
             if transform == 1
             %     file_tform = uigetfile('*.mat','Select the transformation matrix');
                 trans_matrix = imgs.trans_matrix;
-
             end
 
         case 'Select New Images'
@@ -157,12 +158,12 @@ if exist('img_data.mat','file') == 2
             % Format Transformtion Matrix
             if transform == 1
             %     file_tform = uigetfile('*.mat','Select the transformation matrix');
-                trans_matrix = importdata('camera_transform.mat');
+                trans_matrix = importdata(xform_mat);
 
                 imgs.trans_matrix = trans_matrix;
             end
 
-            image_data = {imgs}; %#ok<NASGU>
+            image_data = {imgs};
             save('img_data.mat', 'image_data')
     end
 else
@@ -230,12 +231,12 @@ else
     % Format Transformtion Matrix
     if transform == 1
     %     file_tform = uigetfile('*.mat','Select the transformation matrix');
-        trans_matrix = importdata('camera_transform.mat');
+        trans_matrix = importdata(xform_mat);
 
         imgs.trans_matrix = trans_matrix;
     end
 
-    image_data = {imgs}; %#ok<NASGU>
+    image_data = {imgs};
     save('img_data.mat', 'image_data')
 
 end
@@ -308,6 +309,8 @@ for i = 1:loop
     [n,m,~] = size(donor);
     if transform == 1
         donor_transformed = imtransform(donor,trans_matrix,'XData',[1 m],'YData',[1 n],'FillValues',0);
+%         Rout = imref2d(size(donor),[1 m],[1 n]);
+%         donor = imwarp(donor,trans_matrix,'OutputView',Rout,'FillValues',0);
     end
 
     % Write Donor and FRET to '.tif' files
@@ -327,7 +330,7 @@ for i = 1:loop
 
     % Clear Unnecessary Variables
     if i == 1 
-        donor(:,:,2:end) = []; 
+        donor(:,:,2:end) = [];
         FRET(:,:,2:end) = [];
         if transform == 1
             donor_transformed(:,:,2:end) = [];

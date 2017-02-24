@@ -22,7 +22,7 @@ function varargout = optionsGUI(varargin)
 
 % Edit the above text to modify the response to help optionsGUI
 
-% Last Modified by GUIDE v2.5 21-Feb-2017 12:17:49
+% Last Modified by GUIDE v2.5 24-Feb-2017 16:23:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -65,6 +65,8 @@ handles.opts.svd = 1;
 handles.opts.alpha = 0.00;
 handles.opts.beta = 0.00;
 
+handles.opts.xform_mat = '';
+
 % update handles
 guidata(hObject, handles);
 
@@ -102,9 +104,9 @@ handles.opts.one_mask = state;
 if state == 1
     set(handles.radiobutton3,'Enable','off');
     set(handles.radiobutton3,'Value',0.0);
-    set(handles.radiobutton1,'Value',1.0);
+    set(handles.radiobutton1,'Value',0.0);
     handles.opts.reg_option = 1;
-    set(handles.radiobutton2,'Value',0.0);
+    set(handles.radiobutton2,'Value',1.0);
 else
     set(handles.radiobutton3,'Enable','on');
 end
@@ -120,6 +122,17 @@ guidata(hObject,handles);
 function checkbox8_Callback(hObject, ~, handles)
 state = get(hObject,'Value');
 handles.opts.align_cams = state;
+if state == 1
+    set(handles.pushbutton2,'Enable','off');
+    set(handles.pushbutton4,'Enable','on');
+    set(handles.pushbutton5,'Enable','on');
+    set(handles.text42,'Visible','on');
+else
+    set(handles.pushbutton2,'Enable','on');
+    set(handles.pushbutton4,'Enable','off');
+    set(handles.pushbutton5,'Enable','off');
+    set(handles.text42,'Visible','off');
+end
 guidata(hObject,handles);
 function checkbox9_Callback(hObject, ~, handles)
 state = get(hObject,'Value');
@@ -129,6 +142,9 @@ guidata(hObject,handles);
 
 %% Push Buttons
 function pushbutton2_Callback(hObject, ~, handles)
+if handles.opts.align_cams == 0
+    handles.opts.xform_mat = '';
+end
 handles.output = handles.opts;
 opts = {handles.opts}; %#ok<NASGU>
 save('run_opts.mat', 'opts')
@@ -143,6 +159,16 @@ set(handles.edit2,'String',num2str(beta));
 set(handles.pushbutton2,'Enable','on');
 set(handles.pushbutton3,'Enable','on');
 guidata(hObject,handles);
+function pushbutton4_Callback(hObject, ~, handles)
+disp('Select the camera alignment transformation matrix')
+handles.opts.xform_mat = uigetfile('*.mat','Select the camera alignment transformation matrix');
+set(handles.pushbutton2,'Enable','on');
+set(handles.text42,'Visible','off');
+guidata(hObject,handles);
+function pushbutton5_Callback(~, ~, ~)
+disp('Starting Camera Transformation-Matrix Creation GUI...');
+handle = transformCreationGUI;
+waitfor(handle);
 
 
 %% Radio Button Groups
