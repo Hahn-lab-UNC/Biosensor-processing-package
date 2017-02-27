@@ -37,7 +37,7 @@ function [centres, options, post, errlog] = kmeanst(centres, data, options)
 %	GMMINIT, GMMEM
 %
 
-%	Copyright (c) Ian T Nabney (1996-2001)
+%	Copyright (c) Mo Chen (2016)
 
 [ndata, data_dim] = size(data);
 [ncentres, dim] = size(centres);
@@ -137,4 +137,3 @@ options(8) = e;
 if (options(1) >= 0)
   disp('Warning: Maximum number of iterations has been exceeded');
 end
-

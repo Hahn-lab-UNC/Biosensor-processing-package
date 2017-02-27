@@ -1,4 +1,20 @@
 function varargout = freehand_thresh(varargin)
+% Copyright (c) 2017 Paul LaFosse
+%
+% Created for use by the Klaus Hahn Lab at the University of
+% North Carolina at Chapel Hill
+%
+% Email Contacts:
+% Klaus Hahn: khahn@med.unc.edu
+% Paul LaFosse: lafosse@ad.unc.edu
+%
+% This file is part of a comprehensive package, 2dfretimgproc.
+% 2dfretimgproc is a free software package that can be modified/
+% distributed under the terms described by the GNU General Public 
+% License version 3.0. A copy of this license should have been 
+% present within the 2dfretimgproc package. If not, please visit 
+% the following link to learn more: <http://www.gnu.org/licenses/>.
+%
 % FREEHAND_THRESH MATLAB code for freehand_thresh.fig
 %      FREEHAND_THRESH, by itself, creates a new FREEHAND_THRESH or raises the existing
 %      singleton*.
@@ -22,7 +38,7 @@ function varargout = freehand_thresh(varargin)
 
 % Edit the above text to modify the response to help freehand_thresh
 
-% Last Modified by GUIDE v2.5 20-Feb-2017 15:47:41
+% Last Modified by GUIDE v2.5 27-Feb-2017 17:33:11
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,11 +75,6 @@ handles.output = 0;
 load('maps.mat')
 handles.map1 = map1;
 handles.map2 = map2;
-
-% manage data for playtoggle
-user_data = get(handles.playtoggle1,'UserData');
-user_data.stop = 0;
-set(handles.playtoggle1,'UserData',user_data);
 
 handles.saved_masks = 0;
 
@@ -218,7 +229,7 @@ if ~isempty(get(handles.axes1,'Children'))
     set(handles.uitoggletool1,'Enable','Off');
     set(handles.uitoggletool2,'Enable','Off');
     set(handles.uitoggletool3,'Enable','Off');
-    set(handles.playtoggle1,'Enable','Off');
+    set(handles.moviepush1,'Enable','Off');
 end
 
 % collect current frame index
@@ -284,7 +295,7 @@ set(handles.listbox1,'Enable','On');
 set(handles.uitoggletool1,'Enable','On');
 set(handles.uitoggletool2,'Enable','On');
 set(handles.uitoggletool3,'Enable','On');
-set(handles.playtoggle1,'Enable','On');
+set(handles.moviepush1,'Enable','On');
 
 % check if all masks have been drawn
 if isempty(handles.frameidx_list)
@@ -358,7 +369,7 @@ if ~isempty(get(handles.axes1,'Children'))
     set(handles.uitoggletool1,'Enable','Off');
     set(handles.uitoggletool2,'Enable','Off');
     set(handles.uitoggletool3,'Enable','Off');
-    set(handles.playtoggle1,'Enable','Off');
+    set(handles.moviepush1,'Enable','Off');
 end
 
 % user selection of files and check if file exists
@@ -384,7 +395,7 @@ if go == 0 && ~isempty(get(handles.axes1,'Children'))
     set(handles.uitoggletool1,'Enable','On');
     set(handles.uitoggletool2,'Enable','On');
     set(handles.uitoggletool3,'Enable','On');
-    set(handles.playtoggle1,'Enable','On');
+    set(handles.moviepush1,'Enable','On');
     return;
 elseif go == 0 && isempty(get(handles.axes1,'Children'))
     return
@@ -422,7 +433,7 @@ while 1
         set(handles.uitoggletool1,'Enable','On');
         set(handles.uitoggletool2,'Enable','On');
         set(handles.uitoggletool3,'Enable','On');
-        set(handles.playtoggle1,'Enable','On');
+        set(handles.moviepush1,'Enable','On');
         return;
     elseif isempty(input_str) && isempty(get(handles.axes1,'Children'))
         return
@@ -536,7 +547,7 @@ set(handles.listbox1,'Enable','On');
 set(handles.uitoggletool1,'Enable','On');
 set(handles.uitoggletool2,'Enable','On');
 set(handles.uitoggletool3,'Enable','On');
-set(handles.playtoggle1,'Enable','On');
+set(handles.moviepush1,'Enable','On');
 
 % update handles
 guidata(hObject,handles);
@@ -556,7 +567,7 @@ if ~isempty(get(handles.axes1,'Children'))
     set(handles.uitoggletool1,'Enable','Off');
     set(handles.uitoggletool2,'Enable','Off');
     set(handles.uitoggletool3,'Enable','Off');
-    set(handles.playtoggle1,'Enable','Off');
+    set(handles.moviepush1,'Enable','Off');
 end
 
 % save drawn masks into tiff file
@@ -606,51 +617,9 @@ set(handles.listbox1,'Enable','On');
 set(handles.uitoggletool1,'Enable','On');
 set(handles.uitoggletool2,'Enable','On');
 set(handles.uitoggletool3,'Enable','On');
-set(handles.playtoggle1,'Enable','On');
+set(handles.moviepush1,'Enable','On');
 
 % update handles
-guidata(hObject,handles);
-
-
-%% Play Toggle Callbacks
-function playtoggle1_OnCallback(hObject, ~, handles)
-set(handles.pushbutton1,'Enable','Off');
-set(handles.pushbutton3,'Enable','Off');
-set(handles.save_tag,'Enable','Off');
-set(handles.listbox1,'Enable','Off');
-pause(0.0001)
-guidata(hObject,handles);
-
-pause_time = handles.pausetime/1000;
-i = get(handles.slider3,'Value');
-frames = get(handles.slider3,'Max');
-while 1
-    user_data = get(handles.playtoggle1,'UserData');
-    if user_data.stop
-        user_data.stop = 0;
-        set(handles.playtoggle1,'UserData',user_data);
-        return;
-    end
-    set(handles.slider3,'Value',i);
-    i = i + 1;
-    if i > frames
-        i = 1;
-    end
-    pause(pause_time);
-end
-
-function playtoggle1_OffCallback(hObject, ~, handles)
-user_data = get(hObject,'UserData');
-user_data.stop = 1;
-set(hObject,'UserData',user_data);
-set(handles.pushbutton1,'Enable','On');
-if isempty(handles.frameidx_list)
-    set(handles.pushbutton3,'Enable','On');
-    set(handles.save_tag,'Enable','On');
-end
-set(handles.pushbutton3,'Enable','On');
-set(handles.listbox1,'Enable','On');
-pause(0.0001)
 guidata(hObject,handles);
 
 
@@ -671,3 +640,16 @@ else
     guidata(hObject,handles);
     set(handles.figure1,'Visible','off');
 end
+
+
+%% Movie Button Callback
+function moviepush1_ClickedCallback(~, ~, handles)
+set(handles.moviepush1,'Enable','Off')
+pause_time = handles.pausetime/1000;
+frames = get(handles.slider3,'Max');
+for f = 1:frames
+    set(handles.slider3,'Value',f);
+    pause(pause_time);
+end
+set(handles.slider3,'Value',1);
+set(handles.moviepush1,'Enable','On')

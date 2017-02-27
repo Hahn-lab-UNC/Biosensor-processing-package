@@ -1,4 +1,20 @@
 function varargout = registrationGUI(varargin)
+% Copyright (c) 2017 Paul LaFosse
+%
+% Created for use by the Klaus Hahn Lab at the University of
+% North Carolina at Chapel Hill
+%
+% Email Contacts:
+% Klaus Hahn: khahn@med.unc.edu
+% Paul LaFosse: lafosse@ad.unc.edu
+%
+% This file is part of a comprehensive package, 2dfretimgproc.
+% 2dfretimgproc is a free software package that can be modified/
+% distributed under the terms described by the GNU General Public 
+% License version 3.0. A copy of this license should have been 
+% present within the 2dfretimgproc package. If not, please visit 
+% the following link to learn more: <http://www.gnu.org/licenses/>.
+%
 %registrationGUI M-file for registrationGUI.fig
 %      registrationGUI, by itself, creates a new registrationGUI or raises the existing
 %      singleton*.
@@ -22,7 +38,7 @@ function varargout = registrationGUI(varargin)
 
 % Edit the above text to modify the response to help registrationGUI
 
-% Last Modified by GUIDE v2.5 08-Aug-2016 10:33:49
+% Last Modified by GUIDE v2.5 27-Feb-2017 17:28:50
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -76,14 +92,10 @@ function registrationGUI_OpeningFcn(hObject, ~, handles, varargin)
 % Choose default command line output for registrationGUI
 handles.output = hObject;
 
-global rect;  %#ok<NUSED>
+global rect1 rect2;  %#ok<NUSED>
 
 setGlobaly(0);
 setGlobalx(0);
-
-user_data = get(handles.playtoggle1,'UserData');
-user_data.stop = 0;
-set(handles.playtoggle1,'UserData',user_data);
 
 % base/register --> overlay [R G B]
 % green/blue --> cyan       [0 1 2]
@@ -182,7 +194,7 @@ if isempty(get(handles.axes1,'Children'))  % is the axis empty (i.e. have any 'C
     set(handles.CLim_Max_Tag1, 'String', num2str(handles.CLim_Max_b));  % set the edit box 'CLim_Max_Tag1' to the current CLim_val 'maximum'
     set(handles.CLim_Min_Tag1, 'String', num2str(handles.CLim_Min_b));  % set the edit box 'CLim_Min_Tag1' to the current CLim_val 'minimum'
     colormap(gray);
-    colorbar;
+%     colorbar;
     axis image  % sets the aspect ratio so that the data units are the same in every direction and the plot box fits tightly around the data
     
     % sets image to be registered
@@ -192,7 +204,7 @@ if isempty(get(handles.axes1,'Children'))  % is the axis empty (i.e. have any 'C
     set(handles.CLim_Max_Tag2, 'String', num2str(handles.CLim_Max_r));  % set the edit box 'CLim_Max_Tag2' to the current CLim_val 'maximum'
     set(handles.CLim_Min_Tag2, 'String', num2str(handles.CLim_Min_r));  % set the edit box 'CLim_Min_Tag2' to the current CLim_val 'minimum'
     colormap(gray);
-    colorbar;
+%     colorbar;
     axis image  % sets the aspect ratio so that the data units are the same in every direction and the plot box fits tightly around the data
 
     % sets overlay image
@@ -274,12 +286,18 @@ guidata(hObject, handles);
 
 function mousehover(hObject, varargin)
 handles = guidata(hObject);
-global rect;
-delete(rect);
+global rect1 rect2;
+delete(rect1);
+delete(rect2);
 point = get(handles.figure1,'CurrentPoint');
+fig1pos = get(handles.figure1,'Position');
+conv = [fig1pos(3),fig1pos(4),fig1pos(3),fig1pos(4)];
 ax1pos = get(handles.axes1,'Position');
+ax1pos = ax1pos.*conv;
 ax2pos = get(handles.axes2,'Position');
+ax2pos = ax2pos.*conv;
 ax3pos = get(handles.axes3,'Position');
+ax3pos = ax3pos.*conv;
 xLim = handles.width_b;
 yLim = handles.height_b;
 frame = round(get(handles.slider7,'Value'));
@@ -310,10 +328,13 @@ if inaxes1
     else
         rec_height = 10;
     end
+    
+    set(handles.figure1,'CurrentAxes',handles.axes1);    
+    rect1 = rectangle('Position',[ceil(pt(1,1)) ceil(pt(1,2)) rec_width rec_height],'EdgeColor','c','FaceColor','c');
     set(handles.figure1,'CurrentAxes',handles.axes2);
-    rect = rectangle('Position',[ceil(pt(1,1)) ceil(pt(1,2)) rec_width rec_height],'EdgeColor','c','FaceColor','c');
+    rect2 = rectangle('Position',[ceil(pt(1,1)) ceil(pt(1,2)) rec_width rec_height],'EdgeColor','c','FaceColor','c');
     return;
-elseif inaxes2
+elseif inaxes2    
     pt = get(handles.axes2,'CurrentPoint');
     if (ceil(pt(1,1)) <= 0 || ceil(pt(1,1)) > size(im_b,2))
         return;
@@ -337,7 +358,9 @@ elseif inaxes2
     end
     
     set(handles.figure1,'CurrentAxes',handles.axes1);    
-    rect = rectangle('Position',[ceil(pt(1,1)) ceil(pt(1,2)) rec_width rec_height],'EdgeColor','c','FaceColor','c');
+    rect1 = rectangle('Position',[ceil(pt(1,1)) ceil(pt(1,2)) rec_width rec_height],'EdgeColor','c','FaceColor','c');
+    set(handles.figure1,'CurrentAxes',handles.axes2);
+    rect2 = rectangle('Position',[ceil(pt(1,1)) ceil(pt(1,2)) rec_width rec_height],'EdgeColor','c','FaceColor','c');
     return;
 elseif inaxes3
     pt = get(handles.axes3,'CurrentPoint');
@@ -358,13 +381,6 @@ else
         ));
     return;
 end
-%     im_f = handles.overlay_im;
-%     var = im_f(110,190)
-%     whos var
-%     disp(im_f(ceil(pt(1,2)),ceil(pt(1,1))))
-%     disp(type(im_f(ceil(pt(1,2)),ceil(pt(1,1)))))
-%         ceil(pt(1,2)),ceil(pt(1,1)),im_f(ceil(pt(1,2)),ceil(pt(1,1)))
-
 
 %% CLim Edit Boxes
 function CLim_Min_Tag1_CreateFcn(hObject, ~, ~) %#ok<DEFNU>
@@ -602,7 +618,7 @@ if ~isempty(get(handles.axes1,'Children'))
     set(handles.uitoggletool1,'Enable','Off');
     set(handles.uitoggletool2,'Enable','Off');
     set(handles.uitoggletool3,'Enable','Off');
-    set(handles.playtoggle1,'Enable','Off');
+    set(handles.moviepush1,'Enable','Off');
 end
     
 % import base (b) and register (r) image
@@ -642,7 +658,7 @@ if go == 0 && ~isempty(get(handles.axes1,'Children'))
     set(handles.uitoggletool1,'Enable','On');
     set(handles.uitoggletool2,'Enable','On');
     set(handles.uitoggletool3,'Enable','On');
-    set(handles.playtoggle1,'Enable','On');
+    set(handles.moviepush1,'Enable','On');
     return;
 elseif go == 0 && isempty(get(handles.axes1,'Children'))
     return
@@ -660,7 +676,8 @@ handles.width_r = info_r(1).Width;
 handles.height_r = info_r(1).Height;
 num_frames_r = length(info_r);
 
-handles.rect = rectangle('Position',[0 0 0 0]);
+handles.rect1 = rectangle('Position',[0 0 0 0]);
+handles.rect2 = rectangle('Position',[0 0 0 0]);
 
 % check if image sizes match
 if handles.width_r ~= handles.width_b || handles.height_b ~= handles.height_r
@@ -718,7 +735,7 @@ set(handles.save_tag,'Enable','On');
 set(handles.uitoggletool1,'Enable','On');
 set(handles.uitoggletool2,'Enable','On');
 set(handles.uitoggletool3,'Enable','On');
-set(handles.playtoggle1,'Enable','On');
+set(handles.moviepush1,'Enable','On');
 
 % set max, min, and values of CLim Value sliders
 set(handles.slider1,'Max',handles.CLim_Max_b);    % define slider's max value found in all frames for b
@@ -798,7 +815,7 @@ set(handles.save_tag,'Enable','Off');
 set(handles.uitoggletool1,'Enable','Off');
 set(handles.uitoggletool2,'Enable','Off');
 set(handles.uitoggletool3,'Enable','Off');
-set(handles.playtoggle1,'Enable','Off');
+set(handles.moviepush1,'Enable','Off');
 
 % get number of frames
 frames = get(handles.slider7,'Max');
@@ -875,33 +892,18 @@ set(handles.save_tag,'Enable','On');
 set(handles.uitoggletool1,'Enable','On');
 set(handles.uitoggletool2,'Enable','On');
 set(handles.uitoggletool3,'Enable','On');
-set(handles.playtoggle1,'Enable','On');
+set(handles.moviepush1,'Enable','On');
 
 guidata(hObject,handles);
 
-
-%% Play Toggle Callbacks
-function playtoggle1_OnCallback(~, ~, handles) %#ok<DEFNU>
+%% Movie Button Callback
+function moviepush1_ClickedCallback(~, ~, handles) %#ok<DEFNU>
+set(handles.moviepush1,'Enable','Off')
 pause_time = handles.pausetime/1000;
-i = get(handles.slider7,'Value');
 frames = get(handles.slider7,'Max');
-while 1
-    user_data = get(handles.playtoggle1,'UserData');
-    if user_data.stop
-        user_data.stop = 0;
-        set(handles.playtoggle1,'UserData',user_data);
-        return;
-    end
-    set(handles.slider7,'Value',i);
-    i = i + 1;
-    if i > frames
-        i = 1;
-    end
+for f = 1:frames
+    set(handles.slider7,'Value',f);
     pause(pause_time);
 end
-
-function playtoggle1_OffCallback(hObject, ~, handles) %#ok<DEFNU>
-user_data = get(hObject,'UserData');
-user_data.stop = 1;
-set(hObject,'UserData',user_data);
-guidata(hObject,handles);
+set(handles.slider7,'Value',1);
+set(handles.moviepush1,'Enable','On')

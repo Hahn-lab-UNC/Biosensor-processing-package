@@ -203,7 +203,7 @@ function replot(hObject, src, event)
     
     if(strcmp(get(handles.drawerSlider, 'Enable'), 'on'))
         
-        if Strcmpc(version('-release'),'2014b') < 0 
+        if strcmpc(version('-release'),'2014b') < 0 
             handles.lisdraw1.Enabled = 'off';
             handles.lisdraw2.Enabled = 'off';
             handles.lisdraw5.Enabled = 'off';
@@ -225,7 +225,7 @@ function replot(hObject, src, event)
             set(handles.drawerSlider, 'Value', handles.HORZ_VALUE(1));
         end
         
-        if Strcmpc(version('-release'),'2014b') < 0 
+        if strcmpc(version('-release'),'2014b') < 0 
             handles.lisdraw1.Enabled = 'on';
             handles.lisdraw2.Enabled = 'on';
             handles.lisdraw5.Enabled = 'on';
@@ -452,7 +452,7 @@ set(handles.threshold_range, 'Enable', 'off');
 set(handles.boost,'Enable','off');
 set(handles.suggested, 'Value', 1);
 
-if Strcmpc(version('-release'),'2014b') < 0 
+if strcmpc(version('-release'),'2014b') < 0 
     handles.lismove1.Enabled = 'off';
     handles.lismove2.Enabled = 'off';
     handles.lisdraw1.Enabled = 'off';
@@ -617,7 +617,7 @@ if filename~=0
         set(handles.save_as, 'Enable', 'on');
         set(handles.edit_smoo, 'Enable', 'off', 'String', ' ');
 
-        if Strcmpc(version('-release'),'2014b') < 0
+        if strcmpc(version('-release'),'2014b') < 0
             handles.lismove1.Enabled = 'on';
             handles.lismove2.Enabled = 'on';
             handles.lisdraw1.Enabled = 'on';
@@ -689,7 +689,7 @@ if filename~=0
         set(handles.re_threshold, 'Enable', 'on');
         set(handles.edit_smoo, 'Enable', 'off', 'String', ' ');
 
-        if Strcmpc(version('-release'),'2014b') < 0
+        if strcmpc(version('-release'),'2014b') < 0
             handles.lismove1.Enabled = 'on';                
             handles.lisdraw2.Enabled = 'on';  
             handles.lisdraw7.Enabled = 'on';

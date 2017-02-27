@@ -1,4 +1,20 @@
 function varargout = optionsGUI(varargin)
+% Copyright (c) 2017 Paul LaFosse
+%
+% Created for use by the Klaus Hahn Lab at the University of
+% North Carolina at Chapel Hill
+%
+% Email Contacts:
+% Klaus Hahn: khahn@med.unc.edu
+% Paul LaFosse: lafosse@ad.unc.edu
+%
+% This file is part of a comprehensive package, 2dfretimgproc.
+% 2dfretimgproc is a free software package that can be modified/
+% distributed under the terms described by the GNU General Public 
+% License version 3.0. A copy of this license should have been 
+% present within the 2dfretimgproc package. If not, please visit 
+% the following link to learn more: <http://www.gnu.org/licenses/>.
+%
 %OPTIONSGUI M-file for optionsGUI.fig
 %      OPTIONSGUI, by itself, creates a new OPTIONSGUI or raises the existing
 %      singleton*.

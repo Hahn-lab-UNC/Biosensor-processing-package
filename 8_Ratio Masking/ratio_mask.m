@@ -1,4 +1,20 @@
 function varargout = ratio_mask(varargin)
+% Copyright (c) 2017 Paul LaFosse
+%
+% Created for use by the Klaus Hahn Lab at the University of
+% North Carolina at Chapel Hill
+%
+% Email Contacts:
+% Klaus Hahn: khahn@med.unc.edu
+% Paul LaFosse: lafosse@ad.unc.edu
+%
+% This file is part of a comprehensive package, 2dfretimgproc.
+% 2dfretimgproc is a free software package that can be modified/
+% distributed under the terms described by the GNU General Public 
+% License version 3.0. A copy of this license should have been 
+% present within the 2dfretimgproc package. If not, please visit 
+% the following link to learn more: <http://www.gnu.org/licenses/>.
+%
 % RATIO_MASK MATLAB code for ratio_mask.fig
 %      RATIO_MASK, by itself, creates a new RATIO_MASK or raises the existing
 %      singleton*.
@@ -22,7 +38,7 @@ function varargout = ratio_mask(varargin)
 
 % Edit the above text to modify the response to help ratio_mask
 
-% Last Modified by GUIDE v2.5 18-Jan-2017 15:21:15
+% Last Modified by GUIDE v2.5 27-Feb-2017 17:24:36
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -58,10 +74,6 @@ handles.border1 = cell(1,1);
 handles.border1{1} = 0;
 handles.border2 = 0;
 % handles.border2{1} = 0;
-
-user_data = get(handles.playtoggle1,'UserData');
-user_data.stop = 0;
-set(handles.playtoggle1,'UserData',user_data);
 
 % Load additional colormaps
 load('maps.mat')
@@ -374,7 +386,7 @@ set(handles.save_tag,'Enable','Off');
 set(handles.uitoggletool1,'Enable','Off');
 set(handles.uitoggletool2,'Enable','Off');
 set(handles.uitoggletool3,'Enable','Off');
-set(handles.playtoggle1,'Enable','Off');
+set(handles.moviepush1,'Enable','Off');
 guidata(hObject,handles);
 pause(0.0001);
 
@@ -423,7 +435,7 @@ set(handles.save_tag,'Enable','On');
 set(handles.uitoggletool1,'Enable','On');
 set(handles.uitoggletool2,'Enable','On');
 set(handles.uitoggletool3,'Enable','On');
-set(handles.playtoggle1,'Enable','On');
+set(handles.moviepush1,'Enable','On');
 
 set(handles.text12,'Visible','Off');
 
@@ -536,7 +548,7 @@ if ~isempty(get(handles.axes1,'Children'))
     set(handles.uitoggletool1,'Enable','Off');
     set(handles.uitoggletool2,'Enable','Off');
     set(handles.uitoggletool3,'Enable','Off');
-    set(handles.playtoggle1,'Enable','Off');
+    set(handles.moviepush1,'Enable','Off');
 end
 
 % user selection of files and check if file exists
@@ -576,7 +588,7 @@ if go == 0 && ~isempty(get(handles.axes1,'Children'))
     set(handles.uitoggletool1,'Enable','On');
     set(handles.uitoggletool2,'Enable','On');
     set(handles.uitoggletool3,'Enable','On');
-    set(handles.playtoggle1,'Enable','On');
+    set(handles.moviepush1,'Enable','On');
     return;
 elseif go == 0 && isempty(get(handles.axes1,'Children'))
     return
@@ -631,7 +643,7 @@ for i = 1:num_frames1
     % calculate boundary of ratio image (single loop as per MovThresh)
     binary_im = imfill(logical(handles.frames2{i}),'holes');
     if max(binary_im(:)) == min(binary_im(:))
-        binary_im = ones(size(handles.frames1{frame}));
+        binary_im = ones(size(handles.frames1{i}));
     end
     bounds = bwboundaries(binary_im);
     a = regionprops(logical(binary_im),'Area');
@@ -752,7 +764,7 @@ set(handles.save_tag,'Enable','On');
 set(handles.uitoggletool1,'Enable','On');
 set(handles.uitoggletool2,'Enable','On');
 set(handles.uitoggletool3,'Enable','On');
-set(handles.playtoggle1,'Enable','On');
+set(handles.moviepush1,'Enable','On');
 
 % update handles
 guidata(hObject,handles);
@@ -779,7 +791,7 @@ set(handles.save_tag,'Enable','Off');
 set(handles.uitoggletool1,'Enable','Off');
 set(handles.uitoggletool2,'Enable','Off');
 set(handles.uitoggletool3,'Enable','Off');
-set(handles.playtoggle1,'Enable','Off');
+set(handles.moviepush1,'Enable','Off');
 
 % get number of frames
 frames = get(handles.slider5,'Max');
@@ -832,45 +844,19 @@ set(handles.save_tag,'Enable','On');
 set(handles.uitoggletool1,'Enable','On');
 set(handles.uitoggletool2,'Enable','On');
 set(handles.uitoggletool3,'Enable','On');
-set(handles.playtoggle1,'Enable','On');
+set(handles.moviepush1,'Enable','On');
 
 % update handles
 guidata(hObject,handles);
 
-%% Play Toggle Callbacks
-function playtoggle1_OnCallback(hObject, ~, handles)
-set(handles.pushbutton1,'Enable','Off');
-set(handles.pushbutton2,'Enable','Off');
-set(handles.edit6,'Enable','Off');
-set(handles.slider6,'Enable','Off');
-pause(0.0001)
-guidata(hObject,handles);
-
+%% Movie Button Callback
+function moviepush1_ClickedCallback(~, ~, handles)
+set(handles.moviepush1,'Enable','Off')
 pause_time = handles.pausetime/1000;
-i = get(handles.slider5,'Value');
 frames = get(handles.slider5,'Max');
-while 1
-    user_data = get(handles.playtoggle1,'UserData');
-    if user_data.stop
-        user_data.stop = 0;
-        set(handles.playtoggle1,'UserData',user_data);
-        return;
-    end
-    set(handles.slider5,'Value',i);
-    i = i + 1;
-    if i > frames
-        i = 1;
-    end
+for f = 1:frames
+    set(handles.slider5,'Value',f);
     pause(pause_time);
 end
-
-function playtoggle1_OffCallback(hObject, ~, handles)
-user_data = get(hObject,'UserData');
-user_data.stop = 1;
-set(hObject,'UserData',user_data);
-set(handles.pushbutton1,'Enable','On');
-set(handles.pushbutton2,'Enable','On');
-set(handles.edit6,'Enable','On');
-set(handles.slider6,'Enable','On');
-pause(0.0001)
-guidata(hObject,handles);
+set(handles.slider5,'Value',1);
+set(handles.moviepush1,'Enable','On')
