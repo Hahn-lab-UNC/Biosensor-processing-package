@@ -21,13 +21,13 @@ Use the frame slider under the image to see the results for different frames and
 If the boundary is properly detected, no further steps are required and you can save the masks using the menu: File -> Save as masks. 
 Otherwise, proceed to step 2.
 
-2. Select "Smoothed Curve" in the "Curve selection" box. The red curve will appear over the suggested threshold values (blue curve). 
+2. Select "Smoothed Curve". The red curve will appear over the suggested threshold values (blue curve). 
 Click "Re-threshold" button to threshold images according to the red-curve values. You can move the red curve up and down 
 using the vertical slider on the right. To check the results for new values, click "Re-threshold". To change the range of 
 the threshold values type the maximum and minimum values above and below the slider, respectively. If the boundary is properly detected now, 
 no further steps are required and you can save the masks using the menu: File -> Save as masks. Otherwise, proceed to step 3.
 
-3. Select "Custom Curve" in the "Curve selection" box. A black line with two pivot points for the first and the last frame 
+3. Select "Custom Curve". A black line with two pivot points for the first and the last frame 
 will appear over the suggested threshold values. To create and/or move pivot points, select the time frame with the slider 
 under the image and use the vertical slider on the right to change the threshold value. To remove a pivot point, select the time frame 
 with the slider under the image and click the "Remove pivot" button. To remove all pivot points except for the first and the last frame, 
@@ -61,4 +61,8 @@ and signal and the Otsu algorithm.
 5. "Boost resolution" converts NxM image into (2N)x(2M) image using bilinear interpolation. If boosting is selected, the tif file 
 will have to be imported again. The saved file will also have a (2N)x(2M) pixel size. 
 
+6. "Horizontal Line" will set the threshold curve to a horizontal line to depict a constant threshold value across all time as the
+selection.
+
+7. "Manually Draw Masks" will open a different GUI that is used to manually draw masks for specific time frames of the image. 
 

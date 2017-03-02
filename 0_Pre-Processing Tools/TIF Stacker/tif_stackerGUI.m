@@ -167,6 +167,7 @@ if ~(handles.working_dir==0)
     handles.selected_path = handles.working_dir;
     set(handles.edit1,'FontAngle','normal');
     set(handles.pushbutton1,'Enable','on');
+    set(handles.checkbox1,'Enable','on');
 else
     return
 end
@@ -196,6 +197,11 @@ if ~(handles.working_dir==0)
     handles.num_im = length(handles.image_list);
     str = sprintf('Number of Images to Stack:    %d',handles.num_im);
     set(handles.text8,'String',str);
+end
+if handles.num_im > 0
+    set(handles.checkbox1,'Enable','on');
+else
+    set(handles.checkbox1,'Enable','off');
 end
 guidata(hObject,handles);
 
@@ -241,6 +247,11 @@ if ~(handles.working_dir==0)
     handles.num_im = length(handles.image_list);
     str = sprintf('Number of Images to Stack:    %d',handles.num_im);
     set(handles.text8,'String',str);
+end
+if handles.num_im > 0
+    set(handles.checkbox1,'Enable','on');
+else
+    set(handles.checkbox1,'Enable','off');
 end
 guidata(hObject,handles);
 

@@ -544,15 +544,18 @@ guidata(hObject,handles);
 
 function edit1_Callback(hObject, ~, handles) %#ok<DEFNU>
 var = round(str2double(get(handles.edit1,'String')));
-set(handles.edit1,'String',num2str(var));
 if abs(var) <= 10
-    set(handles.slider5,'Value',var);
+    set(handles.slider5,'Value',-1*var);
+    set(handles.edit1,'String',num2str(var));
 elseif var > 10
-    set(handles.slider5,'Value',10);
-elseif var < 10
     set(handles.slider5,'Value',-10);
+    set(handles.edit1,'String',num2str(10));
+elseif var < 10
+    set(handles.slider5,'Value',10);
+    set(handles.edit1,'String',num2str(-10));
 else
     set(handles.slider5,'Value',0);
+    set(handles.edit1,'String',num2str(0));
 end
 if get(handles.radiobutton1,'Value') ~= 1
     setGlobaly(var);
@@ -560,15 +563,18 @@ end
 guidata(hObject,handles);
 function edit2_Callback(hObject, ~, handles) %#ok<DEFNU>
 var = round(str2double(get(handles.edit2,'String')));
-set(handles.edit2,'String',num2str(var));
 if abs(var) <= 10
     set(handles.slider6,'Value',var);
+    set(handles.edit2,'String',num2str(var));
 elseif var > 10
     set(handles.slider6,'Value',10);
+    set(handles.edit2,'String',num2str(10));
 elseif var < 10
     set(handles.slider6,'Value',-10);
+    set(handles.edit2,'String',num2str(-10));
 else
     set(handles.slider6,'Value',0);
+    set(handles.edit2,'String',num2str(0));
 end
 if get(handles.radiobutton1,'Value') ~= 1
     setGlobalx(var);

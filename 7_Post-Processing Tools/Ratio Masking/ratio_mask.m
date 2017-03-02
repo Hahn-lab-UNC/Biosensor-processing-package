@@ -69,11 +69,13 @@ function ratio_mask_OpeningFcn(hObject, ~, handles, varargin)
 % varargin   command line arguments to ratio_mask (see VARARGIN)
 
 % Choose default command line output for ratio_mask
+
 handles.output = hObject;
 handles.border1 = cell(1,1);
-handles.border1{1} = 0;
 handles.border2 = 0;
-% handles.border2{1} = 0;
+handles.line_color = 'y';
+
+handles.import_on = 0;
 
 % Load additional colormaps
 load('maps.mat')
@@ -174,68 +176,78 @@ guidata(hObject, handles);
 
 function slider5(hObject,~,~)
 handles = guidata(hObject);
-frame = round(get(handles.slider5,'Value'));
-update_images(hObject,frame);
-set(handles.edit5,'String',num2str(frame,'%d')); % set the edit box to indicate the current frame number
-guidata(hObject, handles);
+if handles.import_on == 0
+    handles = guidata(hObject);
+    frame = round(get(handles.slider5,'Value'));
+    update_images(hObject,frame);
+    set(handles.edit5,'String',num2str(frame,'%d')); % set the edit box to indicate the current frame number
+    guidata(hObject, handles);
+end
 
 function slider6(hObject,~,~)
 handles = guidata(hObject);
-frame = round(get(handles.slider5,'Value'));
-handles.thresh_val = round(get(handles.slider6,'Value'));
+if handles.import_on == 0
+    frame = round(get(handles.slider5,'Value'));
+    handles.thresh_val = round(get(handles.slider6,'Value'));
 
-% calculate boundary of frame based on threshold value
-if handles.thresh_val > 0
-    boundary_im = handles.frames1{frame} - handles.thresh_val;
-    boundary_im(boundary_im<0) = 0;
-    binary_im = imfill(logical(boundary_im),'holes');
-    if max(binary_im(:)) == min(binary_im(:))
+    % calculate boundary of frame based on threshold value
+    if handles.thresh_val > 0
+        boundary_im = handles.frames1{frame} - handles.thresh_val;
+        boundary_im(boundary_im<0) = 0;
+        binary_im = imfill(logical(boundary_im),'holes');
+        if max(binary_im(:)) == min(binary_im(:))
+            binary_im = ones(size(handles.frames1{frame}));
+        end
+    else
         binary_im = ones(size(handles.frames1{frame}));
     end
-else
-    binary_im = ones(size(handles.frames1{frame}));
-end
-bounds = bwboundaries(binary_im);
+    bounds = bwboundaries(binary_im);
 
-% plot the boundary on the axis
-set(handles.figure1,'CurrentAxes',handles.axes1);
-guidata(hObject,handles);
-hold(handles.axes1,'on');
-if handles.border1{1} ~= 0
+    % plot the boundary on the axes
+    set(handles.figure1,'CurrentAxes',handles.axes1);
+    guidata(hObject,handles);
+    hold(handles.axes1,'on');
     for i = 1:length(handles.border1)
         delete(handles.border1{i});
-    end    
+    end
+    handles.border1 = cell(1,length(bounds));
+    for k = 1:length(bounds)
+        bx = bounds{k}(:,2);
+        by = bounds{k}(:,1);
+        handles.border1{k} = plot(handles.axes1,bx,by,handles.line_color,'LineWidth',1);
+    end
+    
+    if ~strcmp(get(handles.edit6,'String'),num2str(handles.thresh_val,'%d'))
+        set(handles.edit6,'String',num2str(handles.thresh_val,'%d')); % set the edit box to indicate the current frame number
+    end
+    % update handles
+    guidata(hObject, handles);
 end
-handles.border1 = cell(1,length(bounds));
-for k =1:length(bounds)
-    bx = bounds{k}(:,2);
-    by = bounds{k}(:,1);
-    handles.border1{k} = plot(handles.axes1,bx,by,handles.line_color,'LineWidth',1);
-end
-
-% update handles
-set(handles.edit6,'String',num2str(handles.thresh_val,'%d')); % set the edit box to indicate the current frame number
-guidata(hObject, handles);
 
 function ratio_boundary(hObject,~,~)
 handles = guidata(hObject);
-frame = round(get(handles.slider5,'Value'));
+if handles.import_on == 0
+    disp('ratio boundary')
+    handles = guidata(hObject);
+    frame = round(get(handles.slider5,'Value'));
 
-% grab mask information
-bx = handles.maskx{frame};
-by = handles.masky{frame};
+    % grab mask information
+    bx = handles.maskx{frame};
+    by = handles.masky{frame};
 
-% plot the boundary on the axis
-set(handles.figure1,'CurrentAxes',handles.axes2);
-guidata(hObject,handles);
-hold(handles.axes2,'on');
-if handles.border2 ~= 0
-    delete(handles.border2);
+    % plot the boundary on the axes
+    set(handles.figure1,'CurrentAxes',handles.axes2);
+    guidata(hObject,handles);
+    hold(handles.axes2,'on');
+    if ~isnumeric(handles.border2)
+        delete(handles.border2);
+        handles.border2 = 0;
+    end
+    handles.border2 = plot(handles.axes2,bx,by,handles.line_color,'LineWidth',1);
+
+    %update handles
+    guidata(hObject, handles);
 end
-handles.border2 = plot(handles.axes2,bx,by,handles.line_color,'LineWidth',1);
-
-%update handles
-guidata(hObject, handles);
 
 
 %#ok<*DEFNU>
@@ -341,7 +353,6 @@ elseif isnan(frame)
 else
     set(handles.slider5,'Value',frame);
 end
-guidata(hObject,handles);
 function edit6_Callback(hObject, ~, handles)
 thresh = str2double(get(hObject,'String'));
 thresh_max = get(handles.slider6,'Max');
@@ -354,7 +365,6 @@ elseif isnan(thresh)
 else
     set(handles.slider6,'Value',thresh);
 end
-guidata(hObject,handles);
 function edit7_Callback(hObject, ~, handles)
 handles.pausetime = str2double(get(hObject,'String'));
 guidata(hObject,handles);
@@ -400,7 +410,7 @@ if handles.mask_toggle == 1
         
         binary_im = imfill(logical(boundary_im),'holes');
         if max(binary_im(:)) == min(binary_im(:))
-            binary_im = ones(size(handles.frames1{frame}));
+            binary_im = ones(size(handles.frames1{i}));
         end
         
         handles.mask{i} = binary_im;
@@ -490,20 +500,20 @@ else
     binary_im = ones(size(handles.frames1{frame}));
 end
 bounds = bwboundaries(binary_im);
-a = regionprops(logical(binary_im),'Area');
-area = [a.Area];
-[~,ind] = max(area);
-bound = bounds{ind};
-bx = bound(:,2);
-by = bound(:,1);
 % plot the boundary on the axis
 set(handles.figure1,'CurrentAxes',handles.axes1);
 guidata(hObject,handles);
 hold(handles.axes1,'on');
-if handles.border1 ~= 0
-    delete(handles.border1)
+% if iscell(handles.border1)
+for i = 1:length(handles.border1)
+    delete(handles.border1{i});
 end
-handles.border1 = plot(handles.axes1,bx,by,handles.line_color,'LineWidth',1);
+handles.border1 = cell(1,length(bounds));
+for k = 1:length(bounds)
+    bx = bounds{k}(:,2);
+    by = bounds{k}(:,1);
+    handles.border1{k} = plot(handles.axes1,bx,by,handles.line_color,'LineWidth',1);
+end
 
 % update axes 2
 % grab mask information
@@ -513,8 +523,9 @@ by = handles.masky{frame};
 set(handles.figure1,'CurrentAxes',handles.axes2);
 guidata(hObject,handles);
 hold(handles.axes2,'on');
-if handles.border2 ~= 0
+if ~isnumeric(handles.border2)
     delete(handles.border2);
+    handles.border2 = 0;
 end
 handles.border2 = plot(handles.axes2,bx,by,handles.line_color,'LineWidth',1);
 
@@ -593,6 +604,17 @@ if go == 0 && ~isempty(get(handles.axes1,'Children'))
 elseif go == 0 && isempty(get(handles.axes1,'Children'))
     return
 end
+
+% reset handle info
+for i = 1:length(handles.border1)
+    delete(handles.border1{i});
+end
+handles.border1 = cell(1,1);
+if ~isnumeric(handles.border2)
+    delete(handles.border2);
+    handles.border2 = 0;
+end
+handles.border2 = 0;
 
 % get image information
 info1 = imfinfo(fullfile(path1,file1));
@@ -673,6 +695,8 @@ set(handles.slider4,'Max',handles.CLim_Max2 - 1.0);
 set(handles.slider4,'Min',handles.CLim_Min2);
 set(handles.slider4,'Value',handles.CLim_Min2);
 
+handles.import_on = 1;
+guidata(hObject,handles);
 % set bounds and initialize frame slider
 set(handles.slider5,'Min',1);
 set(handles.slider5,'Max',num_frames1);
@@ -683,19 +707,19 @@ set(handles.slider6,'Min',handles.CLim_Min1);
 set(handles.slider6,'Max',handles.CLim_Max1);
 set(handles.slider6,'Value',handles.CLim_Min1);
 set(handles.slider6,'SliderStep',[1/handles.CLim_Max1,1/handles.CLim_Max1]);
+handles.import_on = 0;
+guidata(hObject,handles);
 
 % initialize thresh/mask data
 handles.thresh_val = get(handles.slider6,'Value');
 handles.mask_toggle = 0;
 set(handles.edit6,'String',num2str(handles.thresh_val));
-% handles.border1 = 0;
-% handles.border2 = 0;
 guidata(hObject,handles);
 
 % update image axes
 update_images(hObject,round(get(handles.slider5,'Value')));
 colormap('Gray');
-handles.line_color = 'y';
+handles.init_import_toggle = 1;
 % contents = cellstr(get(handles.popupmenu1,'String'));
 % cm = contents{get(handles.popupmenu1,'Value')};
 % colormap(cm);
@@ -709,10 +733,11 @@ by = handles.masky{1};
 set(handles.figure1,'CurrentAxes',handles.axes2);
 guidata(hObject,handles);
 hold(handles.axes2,'on');
-if handles.border2 ~= 0
+if iscell(handles.border2)
     delete(handles.border2);
+    handles.border2 = 0;
 end
-handles.border2 = plot(handles.axes2,bx,by,'y','LineWidth',1);
+handles.border2 = plot(handles.axes2,bx,by,handles.line_color,'LineWidth',1);
 
 % set initial max and min pixel values
 set(handles.edit1, 'String', num2str(handles.CLim_Max1));

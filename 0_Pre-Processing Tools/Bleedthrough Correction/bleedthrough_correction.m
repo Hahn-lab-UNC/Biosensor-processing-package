@@ -40,30 +40,34 @@ post_images.b = cell(1,q.beta_pairs*2);
 pause(.2)
 
 % read in raw images
+count = 1;
 for i = 1:q.alpha_pairs*2
     if mod(i,2)
-        disp('Select donor')
+        fprintf('Select donor %d\n',count)
         [file,path] = uigetfile('*.tif','Select donor');
         pre_images.a{i} = imread(fullfile(path,file));
         pause(.2)
     else
-        disp('Select FRET')
+        fprintf('Select FRET %d\n',count)
         [file,path] = uigetfile('*.tif','Select FRET');
         pre_images.a{i} = imread(fullfile(path,file));
         pause(.2)
+        count = count + 1;
     end
 end
+count = 1;
 for i = 1:q.beta_pairs*2
     if mod(i,2)
-        disp('Select acceptor')
+        fprintf('Select acceptor %d\n',count)
         [file,path] = uigetfile('*.tif','Select acceptor');
         pre_images.b{i} = imread(fullfile(path,file));
         pause(.2)
     else
-        disp('Select FRET')
+        fprintf('Select FRET %d\n',count)
         [file,path] = uigetfile('*.tif','Select FRET');
         pre_images.b{i} = imread(fullfile(path,file));
         pause(.2)
+        count = count + 1;
     end
 end
 

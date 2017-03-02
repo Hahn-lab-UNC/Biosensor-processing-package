@@ -178,9 +178,11 @@ guidata(hObject,handles);
 function pushbutton4_Callback(hObject, ~, handles)
 disp('Select the camera alignment transformation matrix')
 handles.opts.xform_mat = uigetfile('*.mat','Select the camera alignment transformation matrix');
-set(handles.pushbutton2,'Enable','on');
-set(handles.text42,'Visible','off');
-guidata(hObject,handles);
+if handles.opts.xform_mat ~= 0
+    set(handles.pushbutton2,'Enable','on');
+    set(handles.text42,'Visible','off');
+    guidata(hObject,handles);
+end
 function pushbutton5_Callback(~, ~, ~)
 disp('Starting Camera Transformation-Matrix Creation GUI...');
 handle = transformCreationGUI;

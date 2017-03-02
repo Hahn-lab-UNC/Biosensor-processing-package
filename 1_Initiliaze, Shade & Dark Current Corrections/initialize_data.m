@@ -51,7 +51,8 @@ end
 %% - Select Data to Import
 if exist('img_data.mat','file') == 2
     % Construct a questdlg with three options
-    choice = questdlg('An "image data" file was found in the working path. Would you like to use these images or select new images?', ...
+    choice = questdlg(sprintf(['An "image data" file was found in the working path. Would you like to use these images or select new images?\n\n', ...
+                       'WARNING: If the user selects to use the existing ?img_data.mat? file, MATLAB will search the whole set path to find files with the specified file name within the configuration file. If multiple files within the set path share the same filename as listed in the configuration file, then MATLAB may grab the image data from the wrong file. Please make sure only the files the user wishes to process are within the set path.']), ...
         'Select Images', ...
         'Use "img_data.mat"','Select New Images','Use "img_data.mat"');
     % Handle response
@@ -229,7 +230,7 @@ else
         disp('Select the dark current image for the donor channel')
         file_donor_dark = uigetfile('*.tif','Select the dark current image for the donor channel');
         disp('Select the dark current image for the acceptor channel')
-        file_acceptor_dark = uigetfile('*.tif','Select the dark current image for the acceptor channel');
+        file_acceptor_dark = uigetfile('*.tif','Select the dark current image for the FRET/acceptor channel');
 
         imgs.donor_dark = file_donor_dark;
         imgs.acceptor_dark = file_acceptor_dark;

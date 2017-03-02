@@ -22,8 +22,49 @@ task = questdlg('Would you like to perform automatic photobleach correction or t
     'WARNING!', ...
     'Select Exclusion Criteria','Automatic Photobleach Correcton','Automatic Photobleach Correcton');
 if strcmp(task,'Select Exclusion Criteria')
-    handle = photobleachGUI;
-    waitfor(handle)
+    while 1
+        handle = photobleachGUI;
+        waitfor(handle)
+        if svd == 1
+            if ~exist('donor_pbc.tif','file') || ~exist('fret_pbc.tif','file')
+                % Construct a questdlg
+                choice = questdlg('Not all channels have had photobleach corrections applied or files aren"t named properly. Would you like to return to the photobleach correction GUI or continue with photobleach correction?', ...
+                    'Warning - Not all necessary images found', ...
+                    'Return to GUI','Continue Processing without Photobleach Correction','Continue Processing without Photobleach Correction');
+                % Handle response
+                switch choice
+                    case 'Return to GUI'
+                        continue
+                    case 'Continue Processing without Photobleach Correction'
+                        disp('Ratioing will continue without photobleach correction...')
+                        load('run_opts.mat');
+                        opts{1,1}.photobleach = 0;
+                        save('run_opts.mat');
+                        clear opts
+                        break
+                end
+            end
+        else
+            if ~exist('donor_pbc.tif','file') || ~exist('fret_pbc.tif','file') || ~exist('acceptor_pbc.tif','file')
+                % Construct a questdlg
+                choice = questdlg('Not all channels have had photobleach corrections applied or files aren"t named properly. Would you like to return to the photobleach correction GUI or continue with photobleach correction?', ...
+                    'Warning - Not all necessary images found', ...
+                    'Return to GUI','Continue Processing without Photobleach Correction','Continue Processing without Photobleach Correction');
+                % Handle response
+                switch choice
+                    case 'Return to GUI'
+                        continue
+                    case 'Continue Processing without Photobleach Correction'
+                        disp('Ratioing will continue without photobleach correction...')
+                        load('run_opts.mat');
+                        opts{1,1}.photobleach = 0;
+                        save('run_opts.mat');
+                        clear opts
+                        break
+                end
+            end
+        end
+    end
 else
     % Import necessary data
     donor_path = cd;
@@ -35,7 +76,9 @@ else
     donor_info = imfinfo(fullfile(donor_path, donor_file));
     frames = numel(donor_info);
     if frames < 4
-        disp('Photobleach correction requires the image series to have at least 4 time frames.')
+        fprintf(['Photobleach correction requires the image series to have\n',...
+            'at least 4 time frames...\n'])
+        disp('Ratioing will continue without photobleach correction...')
         load('run_opts.mat');
         opts{1,1}.photobleach = 0;
         save('run_opts.mat');

@@ -73,45 +73,45 @@ alpha             = opt.alpha;
 beta              = opt.beta;
 
 
-%% --- Specification of channel names --- %%
-% nameList = channel_specify;
-
-
-%% --- Specification of working directory --- %%
-% Select working directory where images to be processed are located and where new files will be saved
-disp('Select working directory to save images inside')
-working_dir = uigetdir;
-cd(working_dir);
-addpath(genpath(working_dir));
-
-
-%% --- Image splitting and configuration --- %%
-disp('Starting Initial Data Configuration');
-initialize_data(single_vs_dual, dark_current, align_cameras, xform_mat);
-
-
-%% --- Region selection & background correction --- %%
-disp('Starting Region Selection and Background Subtraction...');
-background_subtraction(single_vs_dual);
-
-
-%% --- Apply threshold masks --- %%
-disp('Starting Thresholding/Masking GUI...');
-frames_of_interest = MovThresh;
-waitfor(frames_of_interest);
-mask_images(single_vs_dual,one_mask,frames_of_interest);
-
-
-%% --- Registration --- %%
-if register_channels == 1
-    disp('Starting Registration...');
-    handle = registrationGUI;
-    waitfor(handle);
-elseif register_channels == 3
-    disp('Starting Registration...');
-    auto_registration;
-end
-
+% %% --- Specification of channel names --- %%
+% % nameList = channel_specify;
+% 
+% 
+% %% --- Specification of working directory --- %%
+% % Select working directory where images to be processed are located and where new files will be saved
+% disp('Select working directory to save images inside')
+% working_dir = uigetdir;
+% cd(working_dir);
+% addpath(genpath(working_dir));
+% 
+% 
+% %% --- Image splitting and configuration --- %%
+% disp('Starting Initial Data Configuration');
+% initialize_data(single_vs_dual, dark_current, align_cameras, xform_mat);
+% 
+% 
+% %% --- Region selection & background correction --- %%
+% disp('Starting Region Selection and Background Subtraction...');
+% background_subtraction(single_vs_dual);
+% 
+% 
+% %% --- Apply threshold masks --- %%
+% disp('Starting Thresholding/Masking GUI...');
+% frames_of_interest = MovThresh;
+% waitfor(frames_of_interest);
+% mask_images(single_vs_dual,one_mask,frames_of_interest);
+% 
+% 
+% %% --- Registration --- %%
+% if register_channels == 1
+%     disp('Starting Registration...');
+%     handle = registrationGUI;
+%     waitfor(handle);
+% elseif register_channels == 3
+%     disp('Starting Registration...');
+%     auto_registration;
+% end
+photobleach = 1;
 
 %% --- Photobleach correction --- %%
 if photobleach == 1
@@ -120,13 +120,12 @@ if photobleach == 1
 end
 
 
-%% --- Ratioing images --- %%
-if ratio_type == [0,0,0,0]
-    disp('No ratio images selected...')
-else
-    disp('Ratioing Images...');
-    ratio_images(single_vs_dual, register_channels, photobleach, ratio_type, alpha, beta);
-end
+%% --- Ratioing images & corrected FRET--- %%
+disp('Ratioing Images and/or calculating corrected FRET...');
+load('run_opts.mat');
+photobleach = opts{1,1}.photobleach; %#ok<USENS>
+clear opts
+ratio_images(single_vs_dual, register_channels, photobleach, ratio_type, alpha, beta);
 
 
 %% --- Apply filter to ratio image --- %%

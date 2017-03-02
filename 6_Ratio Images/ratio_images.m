@@ -248,7 +248,10 @@ for x=1:frames
     end
 end
 
-disp('Ratio Images are saved with values multiplied by 1000 so as to sign integer values to a 16 bit image while still containing decimal place information. The corresponding ratio values are stored in the respective ".mat" files inside the working directory.');
+fprintf(['Ratio Images are saved with values multiplied by 1000 so as to\n',...
+    'assign integer values to a 16 bit image while still containing\n',...
+    'decimal place information. The corresponding ratio values are stored\n',...
+    'in the respective ".mat" files inside the working directory...\n']);
 if ratio_type(1) == 1
     save('ratio_fret_donor.mat','ratio_cell_fd');
 end
