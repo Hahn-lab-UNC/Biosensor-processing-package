@@ -73,45 +73,107 @@ alpha             = opt.alpha;
 beta              = opt.beta;
 
 
-% %% --- Specification of channel names --- %%
-% % nameList = channel_specify;
-% 
-% 
-% %% --- Specification of working directory --- %%
-% % Select working directory where images to be processed are located and where new files will be saved
-% disp('Select working directory to save images inside')
-% working_dir = uigetdir;
-% cd(working_dir);
-% addpath(genpath(working_dir));
-% 
-% 
-% %% --- Image splitting and configuration --- %%
-% disp('Starting Initial Data Configuration');
-% initialize_data(single_vs_dual, dark_current, align_cameras, xform_mat);
-% 
-% 
-% %% --- Region selection & background correction --- %%
-% disp('Starting Region Selection and Background Subtraction...');
-% background_subtraction(single_vs_dual);
-% 
-% 
-% %% --- Apply threshold masks --- %%
-% disp('Starting Thresholding/Masking GUI...');
-% frames_of_interest = MovThresh;
-% waitfor(frames_of_interest);
-% mask_images(single_vs_dual,one_mask,frames_of_interest);
-% 
-% 
-% %% --- Registration --- %%
-% if register_channels == 1
-%     disp('Starting Registration...');
-%     handle = registrationGUI;
-%     waitfor(handle);
-% elseif register_channels == 3
-%     disp('Starting Registration...');
-%     auto_registration;
-% end
-photobleach = 1;
+%% --- Specification of channel names --- %%
+% nameList = channel_specify;
+
+
+%% --- Specification of working directory --- %%
+% Select working directory where images to be processed are located and where new files will be saved
+disp('Select working directory to save images inside')
+working_dir = uigetdir;
+cd(working_dir);
+addpath(genpath(working_dir));
+
+
+%% --- Image splitting and configuration --- %%
+disp('Starting Initial Data Configuration');
+initialize_data(single_vs_dual, dark_current, align_cameras, xform_mat);
+
+
+%% --- Region selection & background correction --- %%
+disp('Starting Region Selection and Background Subtraction...');
+background_subtraction(single_vs_dual);
+
+
+%% --- Apply threshold masks --- %%
+disp('Starting Thresholding/Masking GUI...');
+% check if necessary masks already exist
+if opt.one_mask == 1
+    condition = exist('maskfor_.tif','file');
+    cond_opt = 1;
+else
+    if opt.svd == 1
+        condition = (exist('maskfor_donor.tif','file') && exist('maskfor_fret.tif','file'));
+        cond_opt = 2;
+    else
+        condition = (exist('maskfor_donor.tif','file') && exist('maskfor_fret.tif','file') && exist('maskfor_acceptor.tif','file'));
+        cond_opt = 3;
+    end
+end
+% if necessary masks exist, ask user if they would like to use them or
+% generate new masks
+gen_new_masks = 1;
+if condition
+    % Construct a questdlg with two options
+    choice = questdlg('Masks of the required name were found in the working path. Use these masks?', ...
+        'WARNING', ...
+        'Use Masks','Generate New Masks','Exit Processing','Use Masks');
+    % Handle response
+    switch choice
+        case 'Use Masks'
+            gen_new_masks = mask_frame_size_checker(cond_opt);
+        case 'Generate New Masks'
+        case 'Exit Processing'
+            disp('Exiting Processing.')
+            return
+    end
+end
+if gen_new_masks == 1
+    while 1
+        frames_of_interest = MovThresh;
+        if frames_of_interest == 0
+            % Construct a questdlg with two options
+            choice = questdlg('No masks generated. Re-open MovThresh to generate new masks or exit porcessing?', ...
+                'WARNING', ...
+                'Open MovThresh','Exit Processing','Open MovThresh');
+            % Handle response
+            switch choice
+                case 'Open MovThresh'
+                    continue
+                case 'Exit Processing'
+                    disp('Exiting Processing.')
+                    return
+            end
+        else
+            break
+        end
+    end
+    waitfor(frames_of_interest)
+else
+    run = load('run_opts.mat');
+    try 
+        frames_of_interest = run.foi;
+    catch
+        frames_of_interest = zeros(run.num_images,1);
+        for i = 1:run.num_images
+            frames_of_interest(i) = i;
+        end
+    end
+    clear run
+end
+mask_images(single_vs_dual,one_mask,frames_of_interest);
+
+
+%% --- Registration --- %%
+if register_channels == 1
+    disp('Starting Registration...');
+    handle = registrationGUI;
+    waitfor(handle);
+elseif register_channels == 3
+    disp('Starting Registration...');
+    auto_registration;
+end
+
 
 %% --- Photobleach correction --- %%
 if photobleach == 1
@@ -122,9 +184,9 @@ end
 
 %% --- Ratioing images & corrected FRET--- %%
 disp('Ratioing Images and/or calculating corrected FRET...');
-load('run_opts.mat');
-photobleach = opts{1,1}.photobleach; %#ok<USENS>
-clear opts
+run = load('run_opts.mat');
+photobleach = run.opts{1,1}.photobleach;
+clear run
 ratio_images(single_vs_dual, register_channels, photobleach, ratio_type, alpha, beta);
 
 

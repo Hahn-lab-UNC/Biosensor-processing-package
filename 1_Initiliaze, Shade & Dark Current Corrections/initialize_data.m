@@ -130,7 +130,7 @@ if exist('img_data.mat','file') == 2
             width = imgInfoA(1).Width;
             height = imgInfoA(1).Height; 
             num_images = length(imgInfoA);
-            save('run_opts.mat', 'num_images');
+            save('run_opts.mat', 'num_images','-append');
 
             if svd == 2
                 disp('Select the acceptor movie')
@@ -204,6 +204,7 @@ else
     width = imgInfoA(1).Width;
     height = imgInfoA(1).Height; 
     num_images = length(imgInfoA);
+    save('run_opts.mat', 'num_images','-append');
 
     if svd == 2
         disp('Select the acceptor movie')

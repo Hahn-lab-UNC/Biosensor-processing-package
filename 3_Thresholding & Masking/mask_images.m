@@ -178,7 +178,7 @@ for i = 1:loop
     end
     
     %% Write the Masked Matrices to Images
-    for j = 1:length(ind);
+    for j = 1:length(ind)
         
         try 
             imwrite(donor_mk(:,:,j), 'donor_masked.tif', 'Compression', 'none', 'WriteMode', 'append');

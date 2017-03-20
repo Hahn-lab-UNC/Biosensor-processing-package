@@ -121,7 +121,7 @@ if state == 1
     set(handles.radiobutton3,'Enable','off');
     set(handles.radiobutton3,'Value',0.0);
     set(handles.radiobutton1,'Value',0.0);
-    handles.opts.reg_option = 1;
+    handles.opts.reg_option = 2;
     set(handles.radiobutton2,'Value',1.0);
 else
     set(handles.radiobutton3,'Enable','on');
