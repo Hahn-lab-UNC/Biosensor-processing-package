@@ -169,7 +169,7 @@ rmpath(handles.working_dir);
 
 % helper functions for horizontal splitting
 function split_h(handles)
-if handles.num_im > 1
+if handles.num_im == 1
     % construct a questdlg about names of saved files
     task = questdlg(sprintf(['Please select a formatting option for saved file names:\n\n', ...
                      'Option1:    left_filename.type    right_filename.type\n', ...
