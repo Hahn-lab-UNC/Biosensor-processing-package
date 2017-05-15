@@ -172,6 +172,8 @@ set(handles.pushbutton3,'Enable','off');
 [alpha,beta] = bleedthrough_correction;
 set(handles.edit1,'String',num2str(alpha));
 set(handles.edit2,'String',num2str(beta));
+handles.opts.alpha = alpha;
+handles.opts.beta = beta;
 set(handles.pushbutton2,'Enable','on');
 set(handles.pushbutton3,'Enable','on');
 guidata(hObject,handles);
