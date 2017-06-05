@@ -450,6 +450,11 @@ if acount <= length(handles.coeffs.alpha)
     str = sprintf('Current Alpha Average: %.3f\n\nCurrent Beta Average:',alpha_avg);
     set(handles.text3,'String',str);
     
+    % update string above images if done with alpha calculations
+    if handles.counter_alpha > length(handles.coeffs.alpha)
+        set(handles.text6,'String','Acceptor Emission:');
+    end    
+    
     guidata(hObject,handles);
     % upload new data
     set(handles.figure1,'CurrentAxes',handles.axes1);
@@ -458,10 +463,6 @@ if acount <= length(handles.coeffs.alpha)
     update_axes(hObject,handles);
     
 elseif bcount <= length(handles.coeffs.beta)
-    if bcount == 1
-        set(handles.text6,'String','Acceptor Emission:');
-    end
-    
     handles.coeffs.beta(bcount) = handles.cur_slope;
     handles.counter_beta = bcount + 1;
     
@@ -470,7 +471,7 @@ elseif bcount <= length(handles.coeffs.beta)
     data(bcount,2) = handles.cur_slope;
     set(handles.uitable1,'Data',data);
 
-    % calculate new alpha average
+    % calculate new beta average
     alpha_avg = mean(data(:,1));
     beta_avg = mean(data([1,bcount],2));
     str = sprintf('Current Alpha Average: %.3f\n\nCurrent Beta Average: %.3f',alpha_avg,beta_avg);
