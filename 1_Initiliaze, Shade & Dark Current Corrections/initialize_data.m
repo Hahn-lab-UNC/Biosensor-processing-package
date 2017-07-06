@@ -68,6 +68,7 @@ if exist('img_data.mat','file') == 2
             file_fret_shade = imgs.fret_shade;
 
             imgInfoA = imfinfo(file_tif_donor);
+            imgInfoB = imfinfo(file_tif_fret);
             width = imgInfoA(1).Width;
             height = imgInfoA(1).Height; 
             num_images = length(imgInfoA);
@@ -76,7 +77,7 @@ if exist('img_data.mat','file') == 2
                 file_tif_acceptor = imgs.acceptor;
                 file_acceptor_shade = imgs.acceptor_shade;
 
-                imgInfoB = imfinfo(file_tif_acceptor);
+                imgInfoC = imfinfo(file_tif_acceptor);
             end
 
             % Format Shade Correction Images
@@ -127,6 +128,7 @@ if exist('img_data.mat','file') == 2
             imgs.fret_shade = file_fret_shade;
 
             imgInfoA = imfinfo(file_tif_donor);
+            imgInfoB = imfinfo(file_tif_fret);
             width = imgInfoA(1).Width;
             height = imgInfoA(1).Height; 
             num_images = length(imgInfoA);
@@ -141,7 +143,7 @@ if exist('img_data.mat','file') == 2
                 imgs.acceptor = file_tif_acceptor;
                 imgs.acceptor_shade = file_acceptor_shade;
 
-                imgInfoB = imfinfo(file_tif_acceptor);
+                imgInfoC = imfinfo(file_tif_acceptor);
             end
 
             % Format Shade Correction Images
@@ -201,6 +203,7 @@ else
     imgs.fret_shade = file_fret_shade;
 
     imgInfoA = imfinfo(file_tif_donor);
+    imgInfoB = imfinfo(file_tif_fret);
     width = imgInfoA(1).Width;
     height = imgInfoA(1).Height; 
     num_images = length(imgInfoA);
@@ -215,7 +218,7 @@ else
         imgs.acceptor = file_tif_acceptor;
         imgs.acceptor_shade = file_acceptor_shade;
 
-        imgInfoB = imfinfo(file_tif_acceptor);
+        imgInfoC = imfinfo(file_tif_acceptor);
     end
 
     % Format Shade Correction Images
@@ -309,12 +312,12 @@ for i = 1:loop
     end
 
     %% Donor and FRET Processing
-    donor = zeros(height, width, length(ind), 'uint16');  % empty matrix for donor/fret preallocated for speed
-    FRET = zeros(height, width, length(ind), 'uint16');  % empty matrix for donor/fret preallocated for speed
-
+    donor = zeros(height, width, length(ind), 'uint16');  % empty matrix for donor preallocated for speed
+    FRET = zeros(height, width, length(ind), 'uint16');  % empty matrix for fret preallocated for speed
+    
     for j = ind
         donor(:,:,find(ind==j,1,'first')) = imread(file_tif_donor, 'Index', j, 'Info', imgInfoA);
-        FRET(:,:,find(ind==j,1,'first')) = imread(file_tif_fret, 'Index', j, 'Info', imgInfoA);
+        FRET(:,:,find(ind==j,1,'first')) = imread(file_tif_fret, 'Index', j, 'Info', imgInfoB);
     end
 
     % Apply Dark Current Correction to Donor and FRET
@@ -336,29 +339,28 @@ for i = 1:loop
 %         imwrite(donor(:,:,j), 'donor.tif', 'Compression', 'none', 'WriteMode', 'append')  % the raw donor images (donor excitation & emission)
         if transform == 1
             imwrite(donor_transformed(:,:,j),  'donor_transformed.tif',  'Compression', 'none', 'WriteMode', 'append')  % the transformed donor images (donor excitation & emission)
-        else
-            donor_transformed = donor;
         end
 %         imwrite(FRET(:,:,j), 'fret.tif', 'Compression', 'none', 'WriteMode', 'append')  % the FRET images (donor excitation, acceptor emission)
     end
 
     % Apply the Normalized Shade Correction to Donor and FRET
-    donor_sc = uint16(bsxfun(@rdivide, double(donor_transformed), donor_shade_norm));
+    if transform == 1
+        donor_sc = uint16(bsxfun(@rdivide, double(donor_transformed), donor_shade_norm));
+    else
+        donor_sc = uint16(bsxfun(@rdivide, double(donor), donor_shade_norm));
+    end
     FRET_sc = uint16(bsxfun(@rdivide, double(FRET), fret_shade_norm));
 
     % Clear Unnecessary Variables
-    if i == 1 
-        donor(:,:,2:end) = [];
-        FRET(:,:,2:end) = [];
-        if transform == 1
-            donor_transformed(:,:,2:end) = [];
-        end
-    else
-        clear('donor', 'FRET')
-        if transform == 1
-            clear('donor_transformed');
-        end
-    end 
+    donor(:,:,2:end) = [];
+    FRET(:,:,2:end) = [];
+    if transform == 1
+        donor_transformed(:,:,2:end) = [];
+    end
+    clear('donor', 'FRET')
+    if transform == 1
+        clear('donor_transformed');
+    end
 
     % Write the Shade Corrected Donor and FRET to '.tif' files
     for j = 1:length(ind)
@@ -367,12 +369,9 @@ for i = 1:loop
     end
 
     % Clear Unnecessary Variables
-    if i == 1
-       donor_sc(:,:,2:end) = [];
-       FRET_sc(:,:,2:end) = [];
-    else
-       clear('donor_sc', 'FRET_sc')
-    end
+   donor_sc(:,:,2:end) = [];
+   FRET_sc(:,:,2:end) = [];
+   clear('donor_sc', 'FRET_sc')
 
 
     %% Acceptor Processing
@@ -381,7 +380,7 @@ for i = 1:loop
         acceptor = zeros(height, width, length(ind), 'uint16');  % empty matrix for acceptor preallocated for speed
 
         for j = ind
-            acceptor(:,:,find(ind==j,1,'first')) = imread(file_tif_acceptor, 'Index', j, 'Info', imgInfoB);
+            acceptor(:,:,find(ind==j,1,'first')) = imread(file_tif_acceptor, 'Index', j, 'Info', imgInfoC);
         end
 
         % Apply Dark Current Correction to Acceptor
